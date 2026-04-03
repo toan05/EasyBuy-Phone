@@ -1,0 +1,46 @@
+@model List<EasyBuy.Models.Brand>
+
+@{
+    ViewData["Title"] = "Quản lý thương hiệu";
+}
+
+<h2>Danh sách thương hiệu</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<p>
+    <a class="btn btn-primary" href="@Url.Action("Create", "Brand", new { area = "Admin" })">Thêm thương hiệu mới</a>
+</p>
+
+<table class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>BrandID</th>
+            <th>Tên thương hiệu</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var brand in Model)
+        {
+            <tr>
+                <td>@brand.BrandId</td>
+                <td>@brand.NameBrand</td>
+                <td>
+                    <a class="btn btn-warning btn-sm" href="@Url.Action("Edit", "Brand", new { area = "Admin", id = brand.BrandId })">Chỉnh sửa</a>
+                    @using (Html.BeginForm("Delete", "Brand", new { area = "Admin", id = brand.BrandId }, FormMethod.Post, new { onsubmit = "return confirm('Bạn có chắc muốn xóa?');" }))
+                    {
+                        <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

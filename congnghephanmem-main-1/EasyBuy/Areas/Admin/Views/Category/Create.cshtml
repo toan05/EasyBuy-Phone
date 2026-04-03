@@ -1,0 +1,20 @@
+@model EasyBuy.Models.Category
+@{
+    ViewData["Title"] = "Thêm Danh mục";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label>Tên danh mục</label>
+        <input class="form-control" name="categoryName" />
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+    <a class="btn btn-secondary" asp-action="Index">Quay lại</a>
+</form>

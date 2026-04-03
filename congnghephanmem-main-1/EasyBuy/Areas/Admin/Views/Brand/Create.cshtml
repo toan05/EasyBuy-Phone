@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Thêm thương hiệu";
+}
+
+<h2>Thêm thương hiệu</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@using (Html.BeginForm("Create", "Brand", new { area = "Admin" }, FormMethod.Post))
+{
+    <div class="mb-3">
+        <label for="nameBrand" class="form-label">Tên thương hiệu</label>
+        <input type="text" name="nameBrand" id="nameBrand" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-success">Lưu</button>
+    <a href="@Url.Action("Index", "Brand", new { area = "Admin" })" class="btn btn-secondary">Huỷ</a>
+}

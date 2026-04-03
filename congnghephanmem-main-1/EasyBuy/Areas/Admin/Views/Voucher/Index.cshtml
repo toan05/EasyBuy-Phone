@@ -1,0 +1,52 @@
+@model IEnumerable<EasyBuy.Models.Voucher>
+@{
+    ViewData["Title"] = "Quản lý Khuyến mãi";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Thêm Mã Khuyến Mãi</a>
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Mã voucher</th>
+            <th>Giá trị</th>
+            <th>Ngày bắt đầu</th>
+            <th>Ngày kết thúc</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.VoucherId</td>
+            <td>@item.Code</td>
+            <td>@(item.DiscountValue?.ToString("C") ?? "")</td>
+            <td>@(item.StartDate.HasValue ? item.StartDate.Value.ToString("dd/MM/yyyy") : "")</td>
+            <td>@(item.EndDate.HasValue ? item.EndDate.Value.ToString("dd/MM/yyyy") : "")</td>
+            <td>@(item.IsActive == true ? "Active" : "Inactive")</td>
+            <td>
+                <a class="btn btn-sm btn-success" asp-action="Edit" asp-route-id="@item.VoucherId">Sửa</a>
+                <form asp-action="Delete" asp-route-id="@item.VoucherId" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?');">Xóa</button>
+                </form>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
