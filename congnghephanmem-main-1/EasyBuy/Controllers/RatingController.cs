@@ -1,4 +1,4 @@
-﻿using EasyBuy.Models;
+﻿﻿using EasyBuy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EasyBuy.Method;
@@ -41,7 +41,10 @@ namespace EasyBuy.Controllers
                 string? imagePath = null;
                 try
                 {
-                    imagePath = await ImageHelper.SaveImageAsync(image, "ratings"); // phương thức trong method ImageHelper để tái sd  
+                    if (image != null)
+                    {
+                        imagePath = await ImageHelper.SaveImageAsync(image, "ratings"); // phương thức trong method ImageHelper để tái sd  
+                    }
                 }
                 catch (InvalidDataException ex)
                 {
@@ -72,7 +75,7 @@ namespace EasyBuy.Controllers
 
                 return RedirectToAction("ViewProductDetails", "Product", new { productId });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewBag.ErrorMessage = "Có lỗi hệ thống.Vui lòng thử lại sau";
                 return View();

@@ -10,3 +10,4 @@ namespace EasyBuy.Areas.NVKT.Controllers
         }
     }
 }
+.

@@ -1,7 +1,0 @@
-[16:33:37] - Hệ thống EasyBuy đã khởi động và Singleton Logger đã sẵn sàng!
-[16:33:41] - Truy cập Trang Chủ - Đang tải danh sách sản phẩm.
-[16:33:52] - Truy cập Trang Chủ - Đang tải danh sách sản phẩm.
-[16:38:41] - Hệ thống EasyBuy đã khởi động và Singleton Logger đã sẵn sàng!
-[16:38:42] - Truy cập Trang Chủ - Đang tải danh sách sản phẩm.
-[16:48:17] - Hệ thống EasyBuy đã khởi động!
-[16:48:18] - Truy cập Trang Chủ - Đang tải danh sách sản phẩm.

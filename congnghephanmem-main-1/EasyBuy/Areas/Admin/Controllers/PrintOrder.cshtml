@@ -1,0 +1,104 @@
+@model EasyBuy.Models.Order
+@{
+    Layout = null; 
+    decimal amountToPay = (Model.StatusPayment == "Đã thanh toán" || Model.PaymentMethodId != 1) ? 0 : (Model.FinalTotal ?? Model.TotalAmount ?? 0);
+    string waybillCode = "EB" + Model.OrderId.ToString().PadLeft(8, '0');
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>In Đơn Hàng #@Model.OrderId</title>
+    <style>
+        @@page { size: A5; margin: 10mm; }
+        body { font-family: Arial, sans-serif; font-size: 14px; line-height: 1.4; color: #000; margin: 0; padding: 0; }
+        .print-container { width: 100%; max-width: 148mm; margin: 0 auto; }
+        .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
+        .barcode { text-align: center; margin: 10px 0; }
+        .info-box { border: 1px solid #000; padding: 10px; margin-bottom: 10px; border-radius: 5px; }
+        .info-title { font-weight: bold; text-decoration: underline; margin-bottom: 5px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        table, th, td { border: 1px solid #000; }
+        th, td { padding: 5px; text-align: left; font-size: 12px; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .total-box { font-size: 16px; font-weight: bold; text-align: right; margin-top: 10px; }
+        .cod-amount { font-size: 22px; font-weight: bold; text-align: center; border: 2px solid #000; padding: 10px; margin-top: 15px; }
+        
+        @@media print {
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body onload="window.print()">
+    <div class="no-print" style="text-align: center; margin: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; font-size: 16px; cursor:pointer; background: #0d6efd; color: white; border: none; border-radius: 5px;">
+            🖨️ Nhấn để in đơn
+        </button>
+    </div>
+
+    <div class="print-container">
+        <div class="header">
+            <h2 style="margin: 0;">CỬA HÀNG EASYBUY</h2>
+            <p style="margin: 5px 0 0 0;">Website: easybuy.com | Hotline: 1900 1234</p>
+        </div>
+
+        <div class="barcode">
+            <img src="https://barcode.tec-it.com/barcode.ashx?data=@waybillCode&code=Code128&translate-esc=on" alt="Mã Vận Đơn"/>
+            <div style="margin-top: 5px;"><strong>Mã Vận Đơn: @waybillCode</strong></div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-title">Người gửi:</div>
+            <div><strong>EasyBuy Store</strong></div>
+            <div>Địa chỉ: 123 Đường ABC, Quận X, TP. HCM</div>
+            <div>SĐT: 1900 1234</div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-title">Người nhận:</div>
+            <div><strong>@(Model.Address?.RecipientName ?? Model.User?.FullName)</strong></div>
+            <div>Địa chỉ: @(Model.Address?.FullAddress ?? "N/A")</div>
+            <div>SĐT: @(Model.Address?.Phone ?? Model.User?.Phone)</div>
+        </div>
+
+        <div class="info-title">Chi tiết đơn hàng (#@Model.OrderId):</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50%">Tên Sản Phẩm</th>
+                    <th class="text-center" style="width: 15%">SL</th>
+                    <th class="text-right" style="width: 35%">Đơn Giá</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.OrderDetails)
+                {
+                    <tr>
+                        <td>@item.Product?.ProductName</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-right">@string.Format("{0:N0} đ", item.UnitPrice)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="total-box">
+            Tổng tiền hàng: @string.Format("{0:N0} đ", Model.FinalTotal ?? Model.TotalAmount)
+        </div>
+
+        <div class="cod-amount">
+            TIỀN THU NGƯỜI NHẬN (COD):<br/>
+            @string.Format("{0:N0} đ", amountToPay)
+            @if (amountToPay == 0)
+            {
+                <div style="font-size:14px; margin-top:5px; font-weight:normal;">(Đơn hàng đã được thanh toán)</div>
+            }
+        </div>
+        
+        <div style="text-align: center; margin-top: 20px; font-size: 12px; font-style: italic;">
+            Chữ ký người nhận<br><br><br><br>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,359 @@
+is_global = true
+build_property.TargetFramework = net9.0
+build_property.TargetFramework = net9.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v9.0
+build_property.RootNamespace = EasyBuy
+build_property.RootNamespace = EasyBuy
+build_property.ProjectDir = /Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 9.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = /Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 9.0
+build_property.EnableCodeStyleSeverity = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Controllers/ListOrders.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vQ29udHJvbGxlcnMvTGlzdE9yZGVycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Controllers/PrintOrder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vQ29udHJvbGxlcnMvUHJpbnRPcmRlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Controllers/ViewOrderDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vQ29udHJvbGxlcnMvVmlld09yZGVyRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Brand/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQnJhbmQvQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Brand/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQnJhbmQvRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Brand/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQnJhbmQvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Category/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQ2F0ZWdvcnkvQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Category/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQ2F0ZWdvcnkvRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Category/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvQ2F0ZWdvcnkvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Layout/_LayoutAdmin.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvTGF5b3V0L19MYXlvdXRBZG1pbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Orders/ListOrders.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvT3JkZXJzL0xpc3RPcmRlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Orders/ViewOrderDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvT3JkZXJzL1ZpZXdPcmRlckRldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Products/CreateProducts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvUHJvZHVjdHMvQ3JlYXRlUHJvZHVjdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Products/ListProducts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvUHJvZHVjdHMvTGlzdFByb2R1Y3RzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Products/UpdateProducts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvUHJvZHVjdHMvVXBkYXRlUHJvZHVjdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Users/EditUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvVXNlcnMvRWRpdFVzZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Users/ListUsers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvVXNlcnMvTGlzdFVzZXJzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Voucher/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvVm91Y2hlci9DcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Voucher/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvVm91Y2hlci9FZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/Views/Voucher/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vVmlld3MvVm91Y2hlci9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/Admin/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvQWRtaW4vX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/Controllers/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9Db250cm9sbGVycy9EZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9WaWV3cy9Ib21lL0luZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/Views/InvoiceNVKD/DetailsInvoice.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9WaWV3cy9JbnZvaWNlTlZLRC9EZXRhaWxzSW52b2ljZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/Views/InvoiceNVKD/ListInvoice.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9WaWV3cy9JbnZvaWNlTlZLRC9MaXN0SW52b2ljZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/Views/Layout/_LayoutNVKD.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9WaWV3cy9MYXlvdXQvX0xheW91dE5WS0QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/Views/OrderNVKD/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9WaWV3cy9PcmRlck5WS0QvRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/Views/OrderNVKD/ListOrderConfirmed.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9WaWV3cy9PcmRlck5WS0QvTGlzdE9yZGVyQ29uZmlybWVkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/Views/OrderNVKD/ListOrderNew.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9WaWV3cy9PcmRlck5WS0QvTGlzdE9yZGVyTmV3LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9fVmlld0ltcG9ydHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKD/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLRC9fVmlld1N0YXJ0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKho/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLaG8vVmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKho/Views/InvoiceWareHouseNVKho/DetailsInvoiceWarehouse.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLaG8vVmlld3MvSW52b2ljZVdhcmVIb3VzZU5WS2hvL0RldGFpbHNJbnZvaWNlV2FyZWhvdXNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKho/Views/InvoiceWareHouseNVKho/ListInvoiceWarehouse.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLaG8vVmlld3MvSW52b2ljZVdhcmVIb3VzZU5WS2hvL0xpc3RJbnZvaWNlV2FyZWhvdXNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKho/Views/InvoiceWareHouseNVKho/ListOrderConfirm.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLaG8vVmlld3MvSW52b2ljZVdhcmVIb3VzZU5WS2hvL0xpc3RPcmRlckNvbmZpcm0uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKho/Views/InvoiceWareHouseNVKho/MakeInvoiceWarehouse.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLaG8vVmlld3MvSW52b2ljZVdhcmVIb3VzZU5WS2hvL01ha2VJbnZvaWNlV2FyZWhvdXNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKho/Views/Layout/_LayoutNVKho.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLaG8vVmlld3MvTGF5b3V0L19MYXlvdXROVktoby5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKho/Views/WarehouseReceipt/CreateWarehouseReceipt.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLaG8vVmlld3MvV2FyZWhvdXNlUmVjZWlwdC9DcmVhdGVXYXJlaG91c2VSZWNlaXB0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVKho/Views/WarehouseReceipt/ListWarehouseReceipt.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZLaG8vVmlld3MvV2FyZWhvdXNlUmVjZWlwdC9MaXN0V2FyZWhvdXNlUmVjZWlwdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Layout/_LayoutNVMKT.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvTGF5b3V0L19MYXlvdXROVk1LVC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Products/CreateProducts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvUHJvZHVjdHMvQ3JlYXRlUHJvZHVjdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Products/ListProducts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvUHJvZHVjdHMvTGlzdFByb2R1Y3RzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Products/UpdateProducts.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvUHJvZHVjdHMvVXBkYXRlUHJvZHVjdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Voucher/CreateVoucher.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvVm91Y2hlci9DcmVhdGVWb3VjaGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Voucher/ListVouchers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvVm91Y2hlci9MaXN0Vm91Y2hlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/Views/Voucher/UpdateVoucher.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvVmlld3MvVm91Y2hlci9VcGRhdGVWb3VjaGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Areas/NVMKT/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvTlZNS1QvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Controllers/ListOrders.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Q29udHJvbGxlcnMvTGlzdE9yZGVycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Pages/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Pages/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJpdmFjeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Pages/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Account/AddAdress.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9BZGRBZHJlc3MuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Account/ChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9DaGFuZ2VQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Account/ListAdress.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9MaXN0QWRyZXNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Account/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Account/SetPassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9TZXRQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Account/UpdateAccount.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9VcGRhdGVBY2NvdW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Account/UpdateAddress.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQWNjb3VudC9VcGRhdGVBZGRyZXNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Cart/UserCart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQ2FydC9Vc2VyQ2FydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Error/Error404.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRXJyb3IvRXJyb3I0MDQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Error/NotFoundPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRXJyb3IvTm90Rm91bmRQYWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Home/TrangChu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9UcmFuZ0NodS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Home/ViewProductDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9WaWV3UHJvZHVjdERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Layout/_LayoutUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTGF5b3V0L19MYXlvdXRVc2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Order/Checkout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvQ2hlY2tvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Order/ListOrder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvTGlzdE9yZGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Order/Success.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvU3VjY2Vzcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Order/VerifyOtp.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvVmVyaWZ5T3RwLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Order/ViewOrderDetails.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvT3JkZXIvVmlld09yZGVyRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Shared/NotFound.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL05vdEZvdW5kLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Views/Wishlist/Wishlist.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvV2lzaGxpc3QvV2lzaGxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/Pages/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-f4t66286y1

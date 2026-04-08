@@ -103,7 +103,7 @@
             font-size: 0.95rem;
         }
 
-        media (max-width: 991.98px) {
+        @@media (max-width: 991.98px) {
             .sidebar-admin {
                 position: relative;
                 width: 100%;
@@ -119,7 +119,7 @@
             }
         }
         
-        media (max-width: 768px) {
+        @@media (max-width: 768px) {
             .sidebar-admin {
                 position: fixed;
                 left: -280px;
@@ -162,6 +162,11 @@
                 <li class="nav-item">
                     <a href="@Url.Action("ListProducts", "Products", new { area = "Admin" })" class="nav-link @(currentController == "Products" ? "active" : "")">
                         <i class="fas fa-boxes"></i> Quản lý sản phẩm
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="@Url.Action("ListOrders", "Orders", new { area = "Admin" })" class="nav-link @(currentController == "Orders" ? "active" : "")">
+                        <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                     </a>
                 </li>
             </ul>

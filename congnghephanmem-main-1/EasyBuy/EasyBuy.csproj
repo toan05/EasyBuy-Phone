@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseSystemDrawing>true</UseSystemDrawing>
+    <RuntimeIdentifier>osx-arm64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>

@@ -30,8 +30,8 @@ namespace EasyBuy.Library // Đảm bảo đúng namespace của bạn
             {
                 string logEntry = $"[{DateTime.Now:HH:mm:ss}] - {message}";
 
-                // Ghi ra Console để xem lúc Debug
-                System.Diagnostics.Debug.WriteLine(logEntry);
+                // Ghi ra Terminal để có thể xem được khi chạy lệnh dotnet run
+                Console.WriteLine(logEntry);
 
                 // Ghi vào file .txt
                 File.AppendAllLines(_logFilePath, new[] { logEntry });

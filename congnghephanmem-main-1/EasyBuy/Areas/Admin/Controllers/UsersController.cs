@@ -1,4 +1,4 @@
-﻿using EasyBuy.Attributes;
+﻿﻿using EasyBuy.Attributes;
 using EasyBuy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -94,7 +94,7 @@ namespace EasyBuy.Areas.Admin.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("ListUsers", "Users", new { area = "Admin" });
             }
-            catch (DbUpdateException dbEx)
+            catch (DbUpdateException)
             {
                 TempData["ErrorMessage"] = "Không thể xóa người dùng vì đang được sử dụng ở bảng khác.";
                 return RedirectToAction("ListUsers", "Users", new { area = "Admin" });

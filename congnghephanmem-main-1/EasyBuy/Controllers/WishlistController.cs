@@ -1,4 +1,4 @@
-﻿using EasyBuy.Models;
+﻿﻿using EasyBuy.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +26,7 @@ namespace EasyBuy.Controllers
                              .ToList();
                 return View(wishlist);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewBag.ErrorMessage = "Có lỗi hệ thống.Vui lòng thử lại sau";
                 return View();
@@ -66,7 +66,7 @@ namespace EasyBuy.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex.Message);
                 ViewBag.ErrorMessage = "Có lỗi hệ thống.Vui lòng thử lại sau";
                 return View();
             }
@@ -112,7 +112,7 @@ namespace EasyBuy.Controllers
                     message = added ? "Đã thêm vào yêu thích!" : "Đã xóa khỏi yêu thích!"
                 });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return Json(new { success = false, message = "Có lỗi hệ thống. Vui lòng thử lại sau" });
             }

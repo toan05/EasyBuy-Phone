@@ -630,7 +630,7 @@
                             </button>
                         }
                         
-                        @if (order.Status == "Chờ xác nhận")
+                        @if (order.Status == "Chờ xác nhận" || order.Status == "Chờ thanh toán")
                         {
                             @using (Html.BeginForm("CancelOrder", "Order", FormMethod.Post, new { style = "display: inline;", onsubmit = "return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');" }))
                             {

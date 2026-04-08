@@ -1,4 +1,4 @@
-﻿using EasyBuy.Models;
+﻿﻿using EasyBuy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -93,7 +93,7 @@ namespace EasyBuy.Controllers
 
                 return RedirectToAction("UserCart");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewBag.ErrorMessage = "Có lỗi hệ thống.Vui lòng thử lại sau";
                 return RedirectToAction("TrangChu", "Home");
@@ -132,7 +132,7 @@ namespace EasyBuy.Controllers
 
                 return RedirectToAction("UserCart");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 ViewBag.ErrorMessage = "Có lỗi hệ thống.Vui lòng thử lại sau";
                 return View();

@@ -1,4 +1,4 @@
-﻿using EasyBuy.Models;
+﻿﻿using EasyBuy.Models;
 using EasyBuy.Services.AUTH;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 
 namespace EasyBuy.Controllers
@@ -14,12 +15,14 @@ namespace EasyBuy.Controllers
     {
         private readonly EasyBuyContext _context;
         private readonly IAuthService _authService;
+        private readonly ILogger<AccountController> _logger;
         private EasyBuy.Method.Method method = new EasyBuy.Method.Method();
         
-        public AccountController(EasyBuyContext context, IAuthService authService)
+        public AccountController(EasyBuyContext context, IAuthService authService, ILogger<AccountController> logger)
         {
             _context = context;
             _authService = authService;
+            _logger = logger;
         }
         [HttpGet]
         public async Task<IActionResult> Login()
@@ -69,7 +72,24 @@ namespace EasyBuy.Controllers
                     return View();
                 }
 
-                if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+                bool isPasswordValid = false;
+                try
+                {
+                    isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.Password);
+                }
+                catch
+                {
+                    // Nếu mật khẩu trong DB chưa được mã hóa (tạo từ Admin)
+                    isPasswordValid = (password == user.Password);
+                    if (isPasswordValid)
+                    {
+                        // Mã hóa lại mật khẩu và lưu vào DB để đảm bảo an toàn cho lần sau
+                        user.Password = BCrypt.Net.BCrypt.HashPassword(password);
+                        _context.SaveChanges();
+                    }
+                }
+
+                if (isPasswordValid)
                 {
                     // Đăng nhập thành công sử dụng AuthService
                     var loginSuccess = await _authService.LoginAsync(user.Email ?? "", password);
@@ -173,51 +193,67 @@ namespace EasyBuy.Controllers
             return View();
         }
         [HttpPost]
+
+        
+        //Logger
         public IActionResult Register(string phone, string password, string repassword, string name, string email)
         {
             try
             {
+                _logger.LogInformation("Bắt đầu đăng ký tài khoản: email={Email}, phone={Phone}", email, phone);
+
                 if (method.IsEmpty(phone) || method.IsEmpty(password) || method.IsEmpty(repassword) || method.IsEmpty(name) || method.IsEmpty(email))
                 {
+                    _logger.LogWarning("Validation fail: các trường trống");
                     ViewBag.MS = "Các trường không được để trống";
                     return View();
                 }
                 if (!method.IsValidPassword(password))
                 {
+                    _logger.LogWarning("Validation fail: password không hợp lệ");
                     ViewBag.MS = "Mật khẩu phải lớn hơn 8 ký tự và có chữ hoa chữ thường";
                     return View();
                 }
                 if (!method.IsValidVietnamPhoneNumber(phone))
                 {
+                    _logger.LogWarning("Validation fail: phone không hợp lệ - {Phone}", phone);
                     ViewBag.MS = "Số điện thoại không hợp lệ";
                     return View();
                 }
                 if (password != repassword)
                 {
+                    _logger.LogWarning("Validation fail: password không khớp");
                     ViewBag.MS = "Mật khẩu nhập lại không đúng";
                     return View();
                 }
                 if (!method.IsValidName(name))
                 {
+                    _logger.LogWarning("Validation fail: name không hợp lệ - {Name}", name);
                     ViewBag.MS = "Tên không được chứa số hay ký tự đặc biệt";
                     return View();
                 }
                 if (!method.IsValidEmail(email))
                 {
+                    _logger.LogWarning("Validation fail: email không hợp lệ - {Email}", email);
                     ViewBag.MS = "Email không hợp lệ";
                     return View();
                 }
                 if (_context.Users.Any(u => u.Phone == phone))
                 {
+                    _logger.LogWarning("Validation fail: phone đã tồn tại - {Phone}", phone);
                     ViewBag.MS = "Số điện thoại đã có người sử dụng";
                     return View();
                 }
 
                 if (_context.Users.Any(u => u.Email == email))
                 {
+                    _logger.LogWarning("Validation fail: email đã tồn tại - {Email}", email);
                     ViewBag.MS = "Email đã có người sử dụng";
                     return View();
                 }
+
+                _logger.LogInformation("Validation thành công, tạo user mới");
+
                 var user = new User
                 {
                     Phone = phone,
@@ -225,15 +261,21 @@ namespace EasyBuy.Controllers
                     Password = BCrypt.Net.BCrypt.HashPassword(password),
                     FullName = name,
                     FailedLoginCount = 0,
-                    AccountStatus = "Active"
+                    AccountStatus = "Active",
+                    Role = "Customer",
+                    CreatedAt = DateTime.Now
                 };
                 _context.Add(user);
                 _context.SaveChanges();
+
+                _logger.LogInformation("Đăng ký thành công cho user {Email}", email);
+
                 return RedirectToAction("Login");
             }
             catch (Exception ex)
             {
-                ViewBag.MS = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau." + ex;
+                _logger.LogError(ex, "Lỗi đăng ký tài khoản: email={Email}, phone={Phone}", email, phone);
+                ViewBag.MS = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
                 return View();
             }
         }
@@ -565,10 +607,10 @@ namespace EasyBuy.Controllers
         }
 
         [HttpPost]
-        public IActionResult LockedAccount(bool confirm)
+        public async Task<IActionResult> LockedAccount(bool confirm)
         {
             int? userid = HttpContext.Session.GetInt32("UserID");
-            var user = _context.Users.Find(userid);
+            var user = await _context.Users.FindAsync(userid);
             if (user == null)
             {
                 TempData["MS"] = "Không tìm thấy tài khoản.";
@@ -578,8 +620,8 @@ namespace EasyBuy.Controllers
             if (confirm)
             {
                 user.AccountStatus = "Locked";
-                Logout();
-                _context.SaveChanges();
+                await Logout();
+                await _context.SaveChangesAsync();
                 TempData["Success"] = "Khóa tài khoản thành công!";
             }
             else
@@ -690,7 +732,7 @@ namespace EasyBuy.Controllers
                 {
                     // Lưu thông tin Google vào session để sử dụng khi đặt mật khẩu
                     string emailName = string.IsNullOrEmpty(fullName) ? email.Split('@')[0] : fullName;
-                    HttpContext.Session.SetString("GoogleEmail", email);
+                    HttpContext.Session.SetString("GoogleEmail", email ?? "");
                     HttpContext.Session.SetString("GoogleName", emailName);
                     
                     // Redirect đến trang đặt mật khẩu
@@ -708,8 +750,8 @@ namespace EasyBuy.Controllers
         public IActionResult SetPassword()
         {
             // Kiểm tra xem có thông tin Google trong session không
-            string email = HttpContext.Session.GetString("GoogleEmail");
-            string name = HttpContext.Session.GetString("GoogleName");
+            string? email = HttpContext.Session.GetString("GoogleEmail");
+            string? name = HttpContext.Session.GetString("GoogleName");
             
             if (string.IsNullOrEmpty(email))
             {
@@ -728,8 +770,8 @@ namespace EasyBuy.Controllers
             try
             {
                 // Lấy thông tin từ session
-                string email = HttpContext.Session.GetString("GoogleEmail");
-                string name = HttpContext.Session.GetString("GoogleName");
+                string? email = HttpContext.Session.GetString("GoogleEmail");
+                string? name = HttpContext.Session.GetString("GoogleName");
                 
                 if (string.IsNullOrEmpty(email))
                 {

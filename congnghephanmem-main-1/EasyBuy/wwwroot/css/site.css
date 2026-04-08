@@ -6,6 +6,30 @@
   color: inherit; /* Giữ nguyên màu chữ theo bố cục hiện tại */
 }
 
+.product-image-container {
+        width: 500px;
+        height: 500px;
+        margin: 0 auto; /* Căn giữa */
+        overflow: hidden;
+        border-radius: 8px; /* Bo góc nhẹ cho đẹp */
+        background-color: #f8f9fa; /* Màu nền cho ảnh trong suốt */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .product-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Hoặc đổi thành 'contain' nếu bạn muốn hiển thị toàn bộ ảnh mà không bị cắt */
+    }
+    
+    /* Chỉnh màu sắc, background cho nút chuyển ảnh (nếu cần) */
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: rgba(0, 0, 0, 0.6);
+        border-radius: 50%;
+        background-size: 50%;
+    }
+
 /* FontAwesome icon styles */
 .fas, .far, .fab, .fal, .fad, .fass, .fasr, .fasl {
   font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Pro', 'Font Awesome 5 Free', 'FontAwesome' !important;
@@ -415,7 +439,7 @@ div i[class*="fa-"] {
 
 /* Vietnamese font optimization */
 @font-face {
-  font-family: 'System-Vietnamese';
+  font-family: 'SF-Pro Display';
   src: local('Arial'), local('Helvetica'), local('Segoe UI'), local('sans-serif');
   font-display: swap;
   unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9;
@@ -631,7 +655,7 @@ p {
 
 .nav-link {
   font-weight: 500;
-  color: var(--text-color) !important;
+  color: black;
   transition: var(--transition);
   position: relative;
 }
@@ -918,22 +942,51 @@ p {
 }
 
 /* Product Grid */
+:root {
+  --bg-color: #000;
+  --text-color: #fff;
+  --card-bg: #111;
+  --card-border: #2c2c2c;
+  --shadow: 0 10px 30px rgba(255, 255, 255, 0.08);
+  --shadow-xl: 0 18px 45px rgba(255, 255, 255, 0.15);
+  --transition: all 0.25s ease;
+  --border-radius-lg: 18px;
+  --accent: #ffffff;
+  --muted: rgba(255, 255, 255, 0.65);
+}
+
+body, html {
+  
+  color: var(--text-color) !important;
+}
+
+a, .text-primary {
+  color: #393939 !important;
+}
+
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 2rem;
   margin: 2rem 0;
 }
 
 .product-card-modern {
-  background: white;
+  background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow);
   overflow: hidden;
   transition: var(--transition);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--card-border);
   position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
+
+.product-card-modern:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-xl);
+}
+
 
 .product-card-modern:hover {
   transform: translateY(-8px);
@@ -943,14 +996,47 @@ p {
 .product-image-container {
   position: relative;
   overflow: hidden;
-  height: 240px;
+  height: 260px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .product-image-container img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: var(--transition);
+  transform: translateY(0);
+  background: #000;
+}
+
+.product-image-container:hover img {
+  transform: scale(1.03);
+}
+
+.image-nav {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 6px;
+  z-index: 5;
+}
+
+.image-nav button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.45);
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.image-nav button:hover {
+  background: rgba(255,255,255,0.15);
+  transform: scale(1.08);
 }
 
 .product-card-modern:hover .product-image-container img {

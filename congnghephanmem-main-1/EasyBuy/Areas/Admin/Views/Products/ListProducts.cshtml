@@ -259,9 +259,14 @@
                     <tr>
                         <td>@product.ProductId</td>
                         <td>
-                            @if (!string.IsNullOrEmpty(product.ImagePr))
+                            @{
+                                var firstImage = string.IsNullOrEmpty(product.ImagePr)
+                                    ? null
+                                    : product.ImagePr.Split(';', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
+                            }
+                            @if (!string.IsNullOrEmpty(firstImage))
                             {
-                                <img src="@product.ImagePr" alt="@product.ProductName" class="product-image" />
+                                <img src="@firstImage" alt="@product.ProductName" class="product-image" />
                             }
                             else
                             {

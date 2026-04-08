@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 
 namespace EasyBuy.Models;
@@ -14,8 +14,8 @@ public class InvoiceWareHouse
 
     public int TotalQuantity { get; set; }
     // === NAVIGATION PROPERTIES ===
-    public virtual User User { get; set; }
-    public virtual User Staff { get; set; }
-    public virtual Order Order { get; set; }
+    public virtual User User { get; set; } = null!;
+    public virtual User Staff { get; set; } = null!;
+    public virtual Order Order { get; set; } = null!;
 
 }

@@ -42,19 +42,21 @@
                 </div>
 
                 <!-- Search Bar -->
-                <div class="flex-grow-1 mx-4 d-none d-md-block">
-                    @using (Html.BeginForm("TrangChu", "Home", FormMethod.Post, new { @class = "d-flex" }))
+                <div class="flex-grow-1 mx-4 d-none d-md-block position-relative"> @using (Html.BeginForm("TrangChu", "Home", FormMethod.Post, new { @class = "d-flex", id="searchForm" }))
                     {
                         <div class="input-group">
-                            <input type="text" name="search" class="form-control border-end-0"
-                                   placeholder="Tìm kiếm sản phẩm..."
-                                   style="border-radius: 25px 0 0 25px; padding: 12px 20px;">
-                            <button class="btn btn-primary px-4" type="submit"
+                            <input type="text" id="searchInput" name="search" class="form-control border-end-0"
+                                placeholder="Tìm kiếm sản phẩm..." autocomplete="off" 
+                                style="border-radius: 25px 0 0 25px; padding: 12px 20px;"> <button class="btn btn-primary px-4" type="submit"
                                     style="border-radius: 0 25px 25px 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
                                 <i class="fas fa-search"></i>
                             </button>
                         </div>
                     }
+                    
+                    <div id="searchResults" class="dropdown-menu w-100 shadow p-0" 
+                        style="display: none; position: absolute; top: 100%; left: 0; z-index: 1050; max-height: 400px; overflow-y: auto; border-radius: 15px; margin-top: 5px;">
+                        </div>
                 </div>
 
                 <!-- Navigation Menu -->
@@ -373,4 +375,75 @@
 
     <script src="~/js/floating-chat.js"></script>
 </body>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let timeout = null;
+
+        if(searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeout); // Xóa timeout cũ để tránh gọi API liên tục
+                const keyword = this.value.trim();
+
+                // Nếu từ khóa ngắn hơn 2 ký tự, ẩn khung kết quả
+                if (keyword.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                // Đợi 300ms sau khi người dùng ngừng gõ mới gọi API (Debounce)
+                timeout = setTimeout(() => {
+                    // Hiển thị trạng thái đang tải (tùy chọn)
+                    searchResults.innerHTML = '<div class="p-3 text-center"><div class="spinner-border text-primary spinner-border-sm"></div> Đang tìm...</div>';
+                    searchResults.style.display = 'block';
+
+                    // Gọi API lên Controller (Thay đổi URL cho đúng với cấu trúc của bạn)
+                    fetch(`/Home/SearchLive?keyword=${encodeURIComponent(keyword)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            searchResults.innerHTML = ''; // Xóa chữ "Đang tìm..."
+                            
+                            if (data && data.length > 0) {
+                                // Lặp qua danh sách sản phẩm và tạo HTML
+                                data.forEach(item => {
+                                    // Chú ý: Cấu trúc item.id, item.name, item.price... phụ thuộc vào dữ liệu bạn trả về từ C#
+                                    const html = `
+                                        <a href="/Product/Detail/${item.productId}" class="dropdown-item d-flex align-items-center py-2 border-bottom text-wrap">
+                                            <img src="${item.imageUrl}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" class="me-3">
+                                            <div style="flex: 1; overflow: hidden;">
+                                                <h6 class="mb-0 text-truncate" style="font-size: 14px;">${item.productName}</h6>
+                                                <span class="text-danger fw-bold" style="font-size: 13px;">${item.price.toLocaleString('vi-VN')} đ</span>
+                                            </div>
+                                        </a>
+                                    `;
+                                    searchResults.insertAdjacentHTML('beforeend', html);
+                                });
+                            } else {
+                                searchResults.innerHTML = '<div class="p-3 text-center text-muted">Không tìm thấy sản phẩm nào</div>';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Lỗi tìm kiếm:', error);
+                            searchResults.innerHTML = '<div class="p-3 text-center text-danger">Có lỗi xảy ra</div>';
+                        });
+                }, 300); 
+            });
+
+            // Ẩn khung kết quả khi click ra ngoài vùng tìm kiếm
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+            
+            // Hiện lại khung nếu click vào input mà đã có dữ liệu
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2 && searchResults.innerHTML.trim() !== '') {
+                    searchResults.style.display = 'block';
+                }
+            });
+        }
+    });
+</script>
 </html>

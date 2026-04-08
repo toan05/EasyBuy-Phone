@@ -1,4 +1,5 @@
 using EasyBuy.Models;
+using System.Threading.Tasks;
 
 namespace EasyBuy.Services.Command
 {
@@ -15,17 +16,15 @@ namespace EasyBuy.Services.Command
         {
             _context.Orders.Add(order);
             cart.IsCheckedOut = true;
-
+            
             foreach (var item in cart.CartItems)
             {
-                var product = await _context.Products.FindAsync(item.ProductId);
-                if (product != null)
+                if (item.Product != null && item.Quantity.HasValue)
                 {
-                    product.Quantity -= item.Quantity ?? 0;
+                    item.Product.Quantity -= item.Quantity.Value;
                 }
             }
 
-            await _context.SaveChangesAsync();
             return order;
         }
     }

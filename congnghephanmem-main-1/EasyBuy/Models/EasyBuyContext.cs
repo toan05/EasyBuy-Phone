@@ -61,6 +61,13 @@ public partial class EasyBuyContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        base.OnModelCreating(modelBuilder);
+        
+        modelBuilder.Entity<WarehouseReceiptDetail>()
+        .Property(w => w.TotalPrice)
+        .HasColumnType("decimal(18, 2)");
+
         modelBuilder.Entity<Address>(entity =>
         {
             entity.HasKey(e => e.AddressId).HasName("PK__Address__091C2A1B4F2CA2FA");

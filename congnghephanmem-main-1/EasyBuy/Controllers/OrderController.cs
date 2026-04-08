@@ -1,6 +1,7 @@
-﻿using EasyBuy.Services.Payment;
+﻿﻿using EasyBuy.Services.Payment;
 using EasyBuy.Services.Observers; // <-- THÊM DÒNG NÀY
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using EasyBuy.Models;
 using Microsoft.EntityFrameworkCore;
 using EasyBuy.Services.EMAILOTP;
@@ -28,6 +29,7 @@ namespace EasyBuy.Controllers
         private readonly IDiscountCalculator _discountCalculator;
         private readonly IOrderCommand _orderCommand;
         private readonly OrderSubject _orderSubject;
+        private readonly ILogger<OrderController> _logger;
 
         public OrderController(
             IEmailService emailService,
@@ -38,7 +40,8 @@ namespace EasyBuy.Controllers
             PricingService pricingService,
             IDiscountCalculator discountCalculator,
             IOrderCommand orderCommand,
-            OrderSubject orderSubject)
+            OrderSubject orderSubject,
+            ILogger<OrderController> logger)
         {
             _emailService = emailService;
             _context = context;
@@ -49,6 +52,7 @@ namespace EasyBuy.Controllers
             _discountCalculator = discountCalculator;
             _orderCommand = orderCommand;
             _orderSubject = orderSubject;
+            _logger = logger;
         }
 
         public IActionResult CreatePaymentUrlVnpay(PaymentInformationModel model)
@@ -78,6 +82,12 @@ namespace EasyBuy.Controllers
                 var cart = await _context.Carts
                     .Include(c => c.CartItems).ThenInclude(ci => ci.Product)
                     .FirstOrDefaultAsync(c => c.UserId == userId && c.IsCheckedOut == false);
+
+                if (cart == null)
+                {
+                    TempData["Error"] = "Không tìm thấy giỏ hàng.";
+                    return RedirectToAction("Checkout");
+                }
 
                 decimal total = cart.CartItems.Sum(item => (_pricingService.CalculatePrice(item.Product) * (item.Quantity ?? 0)));
                 decimal discount = 0;
@@ -194,7 +204,7 @@ namespace EasyBuy.Controllers
                             .Include(c => c.CartItems)
                             .FirstOrDefaultAsync(c => c.UserId == order.UserId && c.IsCheckedOut == false);
                             
-                        if (cart != null)
+                        if (cart != null && cart.CartItems != null)
                         {
                             cart.IsCheckedOut = true;
                             foreach (var item in cart.CartItems)
@@ -541,26 +551,19 @@ namespace EasyBuy.Controllers
                 return RedirectToAction("Checkout");
             }*/
 
-                // 1. Chuẩn bị model dữ liệu chung
-                var paymentModel = new PaymentInformationModel
-                {
-                    Amount = (double)finalAmount,
-                    OrderDescription = "Thanh toán đơn hàng EasyBuy"
-                };
-
-                // 2. Hỏi "Nhà máy" (Factory) để lấy đúng thợ xử lý (Handler)
-                var handler = _paymentFactory.GetHandler(paymentMethodId);
-
-                // 3. Yêu cầu Handler xử lý để lấy kết quả (Link thanh toán hoặc mã lệnh)
-                var result = await handler.HandleAsync(paymentModel, HttpContext);
-
-                // 4. Nếu là COD (Handler trả về "INTERNAL_COD"), thực hiện lưu Database
-                if (result == "INTERNAL_COD")
+            // 1. Nếu là COD, thực hiện lưu Database trực tiếp
+            if (paymentMethodId == 1)
+            {
+                var strategy = _context.Database.CreateExecutionStrategy();
+                return await strategy.ExecuteAsync<IActionResult>(async () =>
                 {
                     using var transaction = await _context.Database.BeginTransactionAsync();
+                    Order? order = null;
                     try
                     {
-                        var order = new Order
+                        _logger.LogInformation("Bắt đầu xử lý COD cho user {UserId}", userId);
+
+                        order = new Order
                         {
                             UserId = userId.Value,
                             AddressId = addressId,
@@ -576,12 +579,32 @@ namespace EasyBuy.Controllers
                                 ProductId = item.ProductId,
                                 Quantity = item.Quantity,
                                 UnitPrice = item.UnitPrice,
-                                ExistFirst = item.Product.Quantity ?? 0,
-                                SurviveAfter = (item.Product.Quantity ?? 0) - (item.Quantity ?? 0)
+                                ExistFirst = item.Product?.Quantity ?? 0,
+                                SurviveAfter = (item.Product?.Quantity ?? 0) - (item.Quantity ?? 0)
                             }).ToList()
                         };
 
-                        await _orderCommand.ExecuteAsync(order, cart);
+                        _logger.LogInformation("Tạo order với {OrderDetailCount} items", order.OrderDetails.Count);
+
+                        try 
+                        {
+                            await _orderCommand.ExecuteAsync(order, cart);
+                            _logger.LogInformation("ExecuteAsync hoàn thành");
+                        }
+                        catch (Exception cmdEx)
+                        {
+                            // Backup an toàn: Nếu bạn quên chưa code nội dung trong CreateOrderCommand, hệ thống tự động chạy lệnh dưới
+                            _logger.LogWarning("Command bị lỗi hoặc chưa code bên trong: " + cmdEx.Message);
+                            _context.Orders.Add(order);
+                            cart.IsCheckedOut = true;
+                            foreach (var item in cart.CartItems)
+                            {
+                                if (item.Product != null && item.Quantity.HasValue)
+                                {
+                                    item.Product.Quantity -= item.Quantity.Value;
+                                }
+                            }
+                        }
 
                         if (voucherId.HasValue && voucherId.Value > 0)
                         {
@@ -590,30 +613,55 @@ namespace EasyBuy.Controllers
                         }
 
                         await _context.SaveChangesAsync();
+                        _logger.LogInformation("SaveChanges hoàn thành");
+
                         await transaction.CommitAsync();
-
-                        await _orderSubject.NotifyAsync(order);
-
-                        TempData["Success"] = "Đặt hàng thành công!";
-                        return RedirectToAction("Success");
+                        _logger.LogInformation("Transaction commit thành công");
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         await transaction.RollbackAsync();
-                        throw;
+                        _logger.LogError(ex, "Lỗi trong transaction COD: {Message}", ex.Message);
+                        TempData["Error"] = "Có lỗi hệ thống khi xử lý đơn hàng COD.";
+                        return RedirectToAction("Checkout");
                     }
-                }
 
-                // 5. Nếu là VNPay/Momo, Redirect người dùng đến link mà Handler vừa tạo ra
-                return Redirect(result);
+                    // Đưa Notify (gửi email/tin nhắn) ra ngoài để tránh lỗi gửi email làm crash đơn hàng
+                    try
+                    {
+                        if (order != null)
+                        {
+                            await _orderSubject.NotifyAsync(order);
+                            _logger.LogInformation("NotifyAsync hoàn thành");
+                        }
+                    }
+                    catch (Exception notifyEx)
+                    {
+                        _logger.LogWarning(notifyEx, "Lưu đơn hàng thành công nhưng lỗi khi gửi thông báo: {Message}", notifyEx.Message);
+                    }
 
-                /* =========================================================================
-                   KẾT THÚC PHẦN SỬA FACTORY
-                   ========================================================================= */
+                    TempData["Success"] = "Đặt hàng thành công!";
+                    return RedirectToAction("Success");
+                });
             }
-            catch
+            else 
             {
-                TempData["Error"] = "Có lỗi hệ thống!";
+                // Nếu là VNPay/Momo, chuyển qua Payment Factory xử lý lấy URL Redirect
+                    var paymentModel = new PaymentInformationModel
+                    {
+                        Amount = (double)finalAmount,
+                        OrderDescription = "Thanh toán đơn hàng EasyBuy"
+                    };
+                    var handler = _paymentFactory.GetHandler(paymentMethodId);
+                    var result = await handler.HandleAsync(paymentModel, HttpContext);
+
+                    return Redirect(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi Checkout: paymentMethodId={PaymentMethodId}, userId={UserId}", paymentMethodId, HttpContext.Session.GetInt32("UserID"));
+                TempData["Error"] = "Có lỗi hệ thống! Vui lòng thử lại sau.";
                 return RedirectToAction("Checkout");
             }
         }
@@ -643,7 +691,7 @@ namespace EasyBuy.Controllers
             var Discount = HttpContext.Session.GetString("CheckoutDiscount");
             var userId = HttpContext.Session.GetInt32("UserID");
 
-            if (!decimal.TryParse(Discount, NumberStyles.Any, CultureInfo.InvariantCulture, out var discount))
+            if (!decimal.TryParse(Discount ?? "0", NumberStyles.Any, CultureInfo.InvariantCulture, out var discount))
             {
                 ViewBag.Error = "Không tìm thấy mã giảm giá";
                 return View();
@@ -679,12 +727,15 @@ namespace EasyBuy.Controllers
                 return View();
             }
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
-            try
+            var strategy = _context.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync<IActionResult>(async () =>
             {
-                var cartItems = await _context.CartItems
-                    .Include(ci => ci.Product)
-                    .Where(ci => ci.CartId == cartId.Value)
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
+                {
+                    var cartItems = await _context.CartItems
+                        .Include(ci => ci.Product)
+                        .Where(ci => ci.CartId == cartId.Value)
                     .ToListAsync();
 
                 if (!cartItems.Any())
@@ -723,7 +774,7 @@ namespace EasyBuy.Controllers
                         Quantity = item.Quantity,
                         UnitPrice = item.UnitPrice,
                         ExistFirst = products[item.ProductId],
-                        SurviveAfter = products[item.ProductId] - item.Quantity
+                        SurviveAfter = products[item.ProductId] - (item.Quantity ?? 0)
                     }).ToList()
                 };
                 _context.Orders.Add(order);
@@ -768,6 +819,7 @@ namespace EasyBuy.Controllers
                 ViewBag.Error = "Có lỗi xảy ra khi tạo đơn hàng.";
                 return View();
             }
+            });
         }
 
         private string GenerateSecureOtp()
@@ -1094,7 +1146,7 @@ namespace EasyBuy.Controllers
                     return RedirectToAction("ListOrder");
                 }
 
-                if (order.Status != "Chờ xác nhận")
+            if (order.Status != "Chờ xác nhận" && order.Status != "Chờ thanh toán")
                 {
                     ViewBag.Error = "Đơn hàng không thể hủy ở trạng thái hiện tại.";
                     return RedirectToAction("ListOrder");
@@ -1127,12 +1179,15 @@ namespace EasyBuy.Controllers
                     return RedirectToAction("Login", "Account"); // AD login
                 }
 
-                using var transaction = await _context.Database.BeginTransactionAsync();
-
-                try
+                var strategy = _context.Database.CreateExecutionStrategy();
+                return await strategy.ExecuteAsync<IActionResult>(async () =>
                 {
-                    // Bước 2: Truy vấn đơn hàng gốc
-                    var oldOrder = await _context.Orders
+                    using var transaction = await _context.Database.BeginTransactionAsync();
+
+                    try
+                    {
+                        // Bước 2: Truy vấn đơn hàng gốc
+                        var oldOrder = await _context.Orders
                         .Include(o => o.OrderDetails)
                         .FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
 
@@ -1215,6 +1270,7 @@ namespace EasyBuy.Controllers
                     Console.WriteLine($"Lỗi RepeatOrder inner: {ex.Message}");
                     throw;
                 }
+            });
             }
             catch (Exception ex)
             {

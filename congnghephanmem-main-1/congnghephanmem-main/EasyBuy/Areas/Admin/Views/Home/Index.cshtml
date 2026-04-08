@@ -1,4 +1,4 @@
-﻿
+﻿﻿
 @{
     ViewData["Title"] = "Dashboard Admin";
     Layout = "~/Areas/Admin/Views/Layout/_LayoutAdmin.cshtml";
@@ -91,6 +91,10 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 @string.Format("{0:N0} VNĐ", ViewBag.TotalRevenue)
                             </div>
+                                <div class="text-xs font-weight-bold text-success mt-2" title="Tổng doanh thu thực tế - Tổng giá nhập">
+                                    <i class="fas fa-arrow-up"></i> Tiền lời: 
+                                    @string.Format("{0:N0} VNĐ", ViewBag.TotalProfit ?? 0)
+                                </div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -150,6 +154,10 @@
                             <div class="h5 mb-0 font-weight-bold text-gray-800">
                                 @string.Format("{0:N0} VNĐ", ViewBag.RevenueThisMonth)
                             </div>
+                                <div class="text-xs font-weight-bold text-success mt-2" title="Doanh thu tháng này - Giá nhập tháng này">
+                                    <i class="fas fa-arrow-up"></i> Tiền lời: 
+                                    @string.Format("{0:N0} VNĐ", ViewBag.ProfitThisMonth ?? 0)
+                                </div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-chart-line fa-2x text-gray-300"></i>
@@ -534,4 +542,3 @@
         border-bottom: 1px solid #e3e6f0;
     }
 </style>
-

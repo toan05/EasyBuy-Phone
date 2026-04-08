@@ -1,4 +1,4 @@
-﻿using EasyBuy.Models;
+﻿﻿using EasyBuy.Models;
 using EasyBuy.Models.MOMO;
 using EasyBuy.Library;
 using EasyBuy.Services.AUTH;
@@ -86,8 +86,8 @@ builder.Services.AddAuthentication(options => {
     options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
 })
 .AddGoogle(options => {
-    options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value;
-    options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value;
+    options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value ?? string.Empty;
+    options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value ?? string.Empty;
     options.CallbackPath = "/signin-google"; // Thêm để đảm bảo login Google ko lỗi
 });
 
@@ -99,7 +99,30 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<EasyBuyContext>();
-    SeedData(context);
+    try
+    {
+        // Tự động thêm các cột mới vào DB nếu chưa có (tránh lỗi database do chưa chạy Migration)
+        context.Database.ExecuteSqlRaw(@"
+            IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[Orders]') AND name = 'FinalTotal')
+            BEGIN
+                ALTER TABLE [dbo].[Orders] ADD [FinalTotal] DECIMAL(10, 2) NULL;
+            END
+            IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[OrderDetail]') AND name = 'ExistFirst')
+            BEGIN
+                ALTER TABLE [dbo].[OrderDetail] ADD [ExistFirst] INT NULL;
+            END
+            IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[OrderDetail]') AND name = 'SurviveAfter')
+            BEGIN
+                ALTER TABLE [dbo].[OrderDetail] ADD [SurviveAfter] INT NULL;
+            END
+        ");
+
+        SeedData(context);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Lỗi khởi tạo CSDL]: {ex.Message}");
+    }
 }
 
 // ==========================================================
@@ -107,6 +130,9 @@ using (var scope = app.Services.CreateScope())
 // ==========================================================
 var logger = app.Services.GetRequiredService<MyLogger>();
 logger.Log("Hệ thống EasyBuy đã khởi động!");
+
+// Đánh thức Singleton Cache để đọc và in lịch sử tìm kiếm ra Terminal ngay lập tức
+var initSearchCache = EasyBuy.Services.Search.SearchCacheSingleton.Instance;
 
 if (!app.Environment.IsDevelopment())
 {
@@ -147,63 +173,67 @@ app.Run();
 // ==========================================================
 void SeedData(EasyBuyContext context)
 {
-    if (context.Users.Any() || context.Categories.Any() || context.Brands.Any() || context.Products.Any() || context.PaymentMethods.Any())
-        return; // Đã có dữ liệu
-
-    // Seed Payment Methods
-    var paymentMethods = new[]
+    // 1. Seed Payment Methods
+    if (!context.PaymentMethods.Any())
     {
-        new PaymentMethod
+        var paymentMethods = new[]
         {
-            MethodName = "Thanh toán khi nhận hàng (COD)",
-            Description = "Thanh toán bằng tiền mặt khi nhận hàng",
-            IsActive = true,
-            CreatedAt = DateTime.Now
-        },
-        new PaymentMethod
+            new PaymentMethod
+            {
+                MethodName = "Thanh toán khi nhận hàng (COD)",
+                Description = "Thanh toán bằng tiền mặt khi nhận hàng",
+                IsActive = true,
+                CreatedAt = DateTime.Now
+            },
+            new PaymentMethod
+            {
+                MethodName = "Thanh toán qua VNPay",
+                Description = "Thanh toán online qua cổng VNPay",
+                IsActive = true,
+                CreatedAt = DateTime.Now
+            },
+            new PaymentMethod
+            {
+                MethodName = "Thanh toán qua MoMo",
+                Description = "Thanh toán online qua ví điện tử MoMo",
+                IsActive = true,
+                CreatedAt = DateTime.Now
+            }
+        };
+        context.PaymentMethods.AddRange(paymentMethods);
+        context.SaveChanges();
+    }
+
+    // 2. Seed Brands
+    if (!context.Brands.Any())
+    {
+        context.Brands.AddRange(new[]
         {
-            MethodName = "Thanh toán qua VNPay",
-            Description = "Thanh toán online qua cổng VNPay",
-            IsActive = true,
-            CreatedAt = DateTime.Now
-        },
-        new PaymentMethod
+            new Brand { NameBrand = "Apple" },
+            new Brand { NameBrand = "Samsung" },
+            new Brand { NameBrand = "Nike" },
+            new Brand { NameBrand = "Adidas" }
+        });
+        context.SaveChanges();
+    }
+
+    // 3. Seed Categories
+    if (!context.Categories.Any())
+    {
+        context.Categories.AddRange(new[]
         {
-            MethodName = "Thanh toán qua MoMo",
-            Description = "Thanh toán online qua ví điện tử MoMo",
-            IsActive = true,
-            CreatedAt = DateTime.Now
-        }
-    };
-    context.PaymentMethods.AddRange(paymentMethods);
-    context.SaveChanges();
+            new Category { CategoryName = "Điện thoại" },
+            new Category { CategoryName = "Laptop" },
+            new Category { CategoryName = "Giày dép" },
+            new Category { CategoryName = "Quần áo" }
+        });
+        context.SaveChanges();
+    }
 
-    // Seed Brands
-    var brands = new[]
+    // 4. Seed Users
+    if (!context.Users.Any(u => u.Email == "admin@easybuy.com"))
     {
-        new Brand { NameBrand = "Apple" },
-        new Brand { NameBrand = "Samsung" },
-        new Brand { NameBrand = "Nike" },
-        new Brand { NameBrand = "Adidas" }
-    };
-    context.Brands.AddRange(brands);
-    context.SaveChanges();
-
-    // Seed Categories
-    var categories = new[]
-    {
-        new Category { CategoryName = "Điện thoại" },
-        new Category { CategoryName = "Laptop" },
-        new Category { CategoryName = "Giày dép" },
-        new Category { CategoryName = "Quần áo" }
-    };
-    context.Categories.AddRange(categories);
-    context.SaveChanges();
-
-    // Seed Users (bao gồm admin và user thường)
-    var users = new[]
-    {
-        new User
+        context.Users.Add(new User
         {
             FullName = "Admin",
             Email = "admin@easybuy.com",
@@ -212,8 +242,12 @@ void SeedData(EasyBuyContext context)
             Role = "Admin",
             AccountStatus = "Active",
             CreatedAt = DateTime.Now
-        },
-        new User
+        });
+    }
+
+    if (!context.Users.Any(u => u.Email == "user@easybuy.com"))
+    {
+        context.Users.Add(new User
         {
             FullName = "Nguyễn Văn A",
             Email = "user@easybuy.com",
@@ -222,64 +256,47 @@ void SeedData(EasyBuyContext context)
             Role = "Customer",
             AccountStatus = "Active",
             CreatedAt = DateTime.Now
-        }
-    };
-    context.Users.AddRange(users);
+        });
+    }
+
     context.SaveChanges();
 
-    // Seed Products
-    var products = new[]
+    // 5. Seed Products
+    var currentBrands = context.Brands.ToList();
+    var currentCategories = context.Categories.ToList();
+
+    var seedProducts = new[]
     {
-        new Product
-        {
-            ProductName = "iPhone 15 Pro",
-            Description = "Điện thoại cao cấp của Apple",
-            SellingPrice = 25000000,
-            Quantity = 10,
-            ImagePr = "/images/iphone15.jpg",
-            CateId = categories[0].CateId, // Điện thoại
-            BrandId = brands[0].BrandId, // Apple
-            StatusProduct = "Active",
-            Barcode = "IPHONE15PRO001"
-        },
-        new Product
-        {
-            ProductName = "Samsung Galaxy S24",
-            Description = "Điện thoại flagship của Samsung",
-            SellingPrice = 20000000,
-            Quantity = 15,
-            ImagePr = "/images/galaxy-s24.jpg",
-            CateId = categories[0].CateId,
-            BrandId = brands[1].BrandId, // Samsung
-            StatusProduct = "Active",
-            Barcode = "SAMSUNGS24ULTRA001"
-        },
-        new Product
-        {
-            ProductName = "MacBook Pro 16\"",
-            Description = "Laptop chuyên nghiệp của Apple",
-            SellingPrice = 50000000,
-            Quantity = 5,
-            ImagePr = "/images/macbook-pro.jpg",
-            CateId = categories[1].CateId, // Laptop
-            BrandId = brands[0].BrandId,
-            StatusProduct = "Active",
-            Barcode = "MACBOOKPRO16INCH001"
-        },
-        new Product
-        {
-            ProductName = "Nike Air Max",
-            Description = "Giày thể thao Nike",
-            SellingPrice = 3000000,
-            Quantity = 20,
-            ImagePr = "/images/nike-airmax.jpg",
-            CateId = categories[2].CateId, // Giày dép
-            BrandId = brands[2].BrandId, // Nike
-            StatusProduct = "Active",
-            Barcode = "NIKEAIRMAX001"
-        }
+        new { Barcode = "IPHONE15PRO001", Name = "iPhone 15 Pro", Category = "Điện thoại", Brand = "Apple", Price = 25000000m, Qty = 10, Image = "/images/iphone15.jpg" },
+        new { Barcode = "SAMSUNGS24ULTRA001", Name = "Samsung Galaxy S24", Category = "Điện thoại", Brand = "Samsung", Price = 20000000m, Qty = 15, Image = "/images/galaxy-s24.jpg" },
+        new { Barcode = "MACBOOKPRO16INCH001", Name = "MacBook Pro 16\"", Category = "Laptop", Brand = "Apple", Price = 50000000m, Qty = 5, Image = "/images/macbook-pro.jpg" },
+        new { Barcode = "NIKEAIRMAX001", Name = "Nike Air Max", Category = "Giày dép", Brand = "Nike", Price = 3000000m, Qty = 20, Image = "/images/nike-airmax.jpg" }
     };
-    context.Products.AddRange(products);
+
+    foreach (var prod in seedProducts)
+    {
+        if (!context.Products.Any(p => p.Barcode == prod.Barcode))
+        {
+            var brand = currentBrands.FirstOrDefault(b => b.NameBrand == prod.Brand);
+            var category = currentCategories.FirstOrDefault(c => c.CategoryName == prod.Category);
+            if (brand == null || category == null)
+                continue;
+
+            context.Products.Add(new Product
+            {
+                ProductName = prod.Name,
+                Description = prod.Name,
+                SellingPrice = prod.Price,
+                Quantity = prod.Qty,
+                ImagePr = prod.Image,
+                CateId = category.CateId,
+                BrandId = brand.BrandId,
+                StatusProduct = "Active",
+                Barcode = prod.Barcode
+            });
+        }
+    }
+
     context.SaveChanges();
 
     Console.WriteLine("✅ Đã seed dữ liệu mẫu thành công!");

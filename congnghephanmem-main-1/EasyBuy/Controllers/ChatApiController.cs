@@ -47,6 +47,6 @@ namespace EasyBuy.Controllers
 
     public class ChatRequest
     {
-        public string UserMessage { get; set; }
+        public string UserMessage { get; set; } = string.Empty;
     }
 } 

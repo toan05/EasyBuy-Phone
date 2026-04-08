@@ -1,0 +1,66 @@
+@model IEnumerable<EasyBuy.Models.Order>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    Layout = "~/Areas/Admin/Views/Layout/_LayoutAdmin.cshtml";
+}
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="fas fa-shopping-cart"></i> Danh sách đơn hàng</h2>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã ĐH</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Thanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>#@item.OrderId</td>
+                            <td>@(item.User?.FullName ?? "N/A")</td>
+                            <td>@item.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="text-danger fw-bold">@string.Format("{0:N0} đ", item.FinalTotal ?? item.TotalAmount)</td>
+                            <td>@item.PaymentMethod?.MethodName</td>
+                            <td>
+                                @if (item.Status == "Chờ xác nhận")
+                                {
+                                    <span class="badge bg-warning text-dark">@item.Status</span>
+                                }
+                                else if (item.Status == "Đã xác nhận" || item.Status == "Đã giao")
+                                {
+                                    <span class="badge bg-success">@item.Status</span>
+                                }
+                                else if (item.Status == "Đã hủy")
+                                {
+                                    <span class="badge bg-danger">@item.Status</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-info">@item.Status</span>
+                                }
+                            </td>
+                            <td>
+                                <a href="@Url.Action("ViewOrderDetails", "Orders", new { area = "Admin", id = item.OrderId })" class="btn btn-sm btn-primary"><i class="fas fa-eye"></i> Xem</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

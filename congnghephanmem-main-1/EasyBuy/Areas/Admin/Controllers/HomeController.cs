@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using Microsoft.AspNetCore.Mvc;
 using EasyBuy.Models;
 using Microsoft.EntityFrameworkCore;
 using EasyBuy.Attributes;
@@ -82,7 +82,7 @@ namespace EasyBuy.Areas.Admin.Controllers
                 {
                     var month = DateTime.Now.AddMonths(-i);
                     var revenue = await _context.Orders
-                        .Where(o => o.CreatedAt.HasValue && 
+                        .Where(o => o.CreatedAt != null && 
                                    o.CreatedAt.Value.Month == month.Month && 
                                    o.CreatedAt.Value.Year == month.Year && 
                                    o.Status == "Đã giao")

@@ -343,7 +343,11 @@
                             <div class="item-content">
                                 <!-- Product Image -->
                                 <div class="item-image">
-                                    <img src="@item.Product?.ImagePr" alt="@item.Product?.ProductName" loading="lazy" />
+                                    @{
+                                        var imageList = !string.IsNullOrEmpty(item.Product?.ImagePr) ? item.Product.ImagePr.Split(';', StringSplitOptions.RemoveEmptyEntries) : new string[] { };
+                                        var firstImage = imageList.FirstOrDefault() ?? "/images/default-product.png";
+                                    }
+                                    <img src="@firstImage" alt="@item.Product?.ProductName" loading="lazy" />
                                 </div>
                                 
                                 <!-- Product Details -->

@@ -1,4 +1,4 @@
-﻿using EasyBuy.Attributes;
+﻿﻿using EasyBuy.Attributes;
 using EasyBuy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +52,7 @@ namespace EasyBuy.Areas.Admin.Controllers
         public async Task<IActionResult> CreateProducts(string productname, string barcode,
             string? description, int quantity, decimal importprice, decimal sellingprice, 
             string statusproduct, decimal discount, bool? isfeatured, 
-            IFormFile? imagepr, int brandid, int cateid)
+            IFormFile? imagepr, List<IFormFile>? images, int brandid, int cateid)
         {
             try
             {
@@ -90,16 +90,42 @@ namespace EasyBuy.Areas.Admin.Controllers
                     UpdatedAt = DateTime.Now
                 };
 
-                if (imagepr != null && imagepr.Length > 0)
+                var storedImages = new List<string>();
+
+                if (images != null && images.Any())
+                {
+                    foreach (var image in images)
+                    {
+                        if (image != null && image.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                            var filePath = Path.Combine("wwwroot", "images", "products", fileName);
+                            var dir = Path.GetDirectoryName(filePath);
+                            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await image.CopyToAsync(stream);
+                            }
+                            storedImages.Add("/images/products/" + fileName);
+                        }
+                    }
+                }
+                else if (imagepr != null && imagepr.Length > 0)
                 {
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imagepr.FileName);
                     var filePath = Path.Combine("wwwroot", "images", "products", fileName);
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    var dir = Path.GetDirectoryName(filePath);
+                    if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await imagepr.CopyToAsync(stream);
                     }
-                    product.ImagePr = "/images/products/" + fileName;
+                    storedImages.Add("/images/products/" + fileName);
+                }
+
+                if (storedImages.Any())
+                {
+                    product.ImagePr = string.Join(";", storedImages);
                 }
 
                 _context.Products.Add(product);
@@ -133,16 +159,17 @@ namespace EasyBuy.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateProducts(int id, string? productname, string? barcode,
             string? description, int? quantity, decimal? importprice, decimal? sellingprice,
-            string? statusproduct, decimal? discount, bool? isfeatured, IFormFile? imagepr,
+            string? statusproduct, decimal? discount, bool? isfeatured, IFormFile? imagepr, List<IFormFile>? images,
             int? brandid, int? cateid)
         {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
             try
             {
-                var product = await _context.Products.FindAsync(id);
-                if (product == null)
-                {
-                    return NotFound();
-                }
 
                 if (!string.IsNullOrWhiteSpace(productname))
                     product.ProductName = productname;
@@ -186,16 +213,42 @@ namespace EasyBuy.Areas.Admin.Controllers
                 if (cateid.HasValue)
                     product.CateId = cateid.Value;
 
-                if (imagepr != null && imagepr.Length > 0)
+                var storedImages = product.ImagePr?.Split(';', StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>();
+
+                if (images != null && images.Any())
+                {
+                    foreach (var image in images)
+                    {
+                        if (image != null && image.Length > 0)
+                        {
+                            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                            var filePath = Path.Combine("wwwroot", "images", "products", fileName);
+                            var dir = Path.GetDirectoryName(filePath);
+                            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await image.CopyToAsync(stream);
+                            }
+                            storedImages.Add("/images/products/" + fileName);
+                        }
+                    }
+                }
+                else if (imagepr != null && imagepr.Length > 0)
                 {
                     var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imagepr.FileName);
                     var filePath = Path.Combine("wwwroot", "images", "products", fileName);
-                    Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                    var dir = Path.GetDirectoryName(filePath);
+                    if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await imagepr.CopyToAsync(stream);
                     }
-                    product.ImagePr = "/images/products/" + fileName;
+                    storedImages.Add("/images/products/" + fileName);
+                }
+
+                if (storedImages.Any())
+                {
+                    product.ImagePr = string.Join(";", storedImages);
                 }
 
                 product.UpdatedAt = DateTime.Now;
@@ -210,7 +263,7 @@ namespace EasyBuy.Areas.Admin.Controllers
                 TempData["ErrorMessage"] = "Có lỗi xảy ra: " + ex.Message;
                 ViewBag.Brands = await _context.Brands.ToListAsync();
                 ViewBag.Categories = await _context.Categories.ToListAsync();
-                return View();
+                return View(product);
             }
         }
 

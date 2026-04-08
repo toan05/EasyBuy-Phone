@@ -1,4 +1,4 @@
-﻿using EasyBuy.Models;
+﻿﻿using EasyBuy.Models;
 using EasyBuy.Services.AUTH;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
@@ -69,7 +69,22 @@ namespace EasyBuy.Controllers
                     return View();
                 }
 
-                if (BCrypt.Net.BCrypt.Verify(password, user.Password))
+                bool isPasswordValid = false;
+                try
+                {
+                    isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.Password);
+                }
+                catch
+                {
+                    isPasswordValid = (password == user.Password);
+                    if (isPasswordValid)
+                    {
+                        user.Password = BCrypt.Net.BCrypt.HashPassword(password);
+                        _context.SaveChanges();
+                    }
+                }
+
+                if (isPasswordValid)
                 {
                     // Đăng nhập thành công sử dụng AuthService
                     var loginSuccess = await _authService.LoginAsync(user.Email ?? "", password);
@@ -225,7 +240,9 @@ namespace EasyBuy.Controllers
                     Password = BCrypt.Net.BCrypt.HashPassword(password),
                     FullName = name,
                     FailedLoginCount = 0,
-                    AccountStatus = "Active"
+                    AccountStatus = "Active",
+                    Role = "Customer",
+                    CreatedAt = DateTime.Now
                 };
                 _context.Add(user);
                 _context.SaveChanges();

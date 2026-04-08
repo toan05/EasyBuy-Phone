@@ -15,15 +15,21 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @RenderSection("Styles", required: false)
     <style>
+        /* Override theme đen/trắng cho trang admin */
         body {
-            background: #f9fafb;
+            background: #f9fafb !important;
+            color: #ffffff !important;
             font-family: "Segoe UI", Roboto, Helvetica, sans-serif;
+        }
+
+        a, .text-primary {
+            color: #dc3545 !important;
         }
 
         .sidebar-admin {
             min-height: 100vh;
-            background: #ffffff;
-            color: #333;
+            background: #ffffff !important;
+            color: #ffffff !important;
             border-right: 1px solid #e0e0e0;
             box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
             position: fixed;
@@ -38,7 +44,7 @@
                 font-weight: 600;
                 padding: 2rem 1rem 1rem;
                 text-align: center;
-                color: #dc3545;
+                color: #dc3545 !important;
             }
 
                 .sidebar-admin .sidebar-header div {
@@ -48,7 +54,7 @@
                 }
 
             .sidebar-admin .nav-link {
-                color: #555;
+                color: #555 !important;
                 border-radius: 8px;
                 margin: 4px 0;
                 font-weight: 500;
@@ -58,8 +64,8 @@
 
                 .sidebar-admin .nav-link.active,
                 .sidebar-admin .nav-link:hover {
-                    color: #dc3545;
-                    background-color: #fdf2f2;
+                    color: #dc3545 !important;
+                    background-color: #fdf2f2 !important;
                 }
 
                 .sidebar-admin .nav-link i {
@@ -77,7 +83,7 @@
                 .sidebar-admin .user-info .fa-user-circle {
                     font-size: 2rem;
                     margin-right: 10px;
-                    color: #dc3545;
+                    color: #dc3545 !important;
                 }
 
             .sidebar-admin .logout-btn {
@@ -86,24 +92,46 @@
             }
 
         footer {
-            background: #ffffff;
+            background: #ffffff !important;
             border-top: 1px solid #e6e9f0;
+            color: #6c757d !important;
         }
 
         main.content {
-            background: #fff;
+            background: #fff !important;
             border-radius: 10px;
             padding: 2rem;
             margin: 1rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
             margin-left: 300px;
+            color: #333 !important;
         }
 
         .dropdown-menu {
             font-size: 0.95rem;
         }
 
-        media (max-width: 991.98px) {
+        /* Override các element khác */
+        .card, .alert, .table {
+            color: #333 !important;
+        }
+
+        .card-header, .card-body {
+            background: #fff !important;
+            color: #333 !important;
+        }
+
+        .btn-primary {
+            background-color: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+
+        .btn-primary:hover {
+            background-color: #c82333 !important;
+            border-color: #bd2130 !important;
+        }
+
+        @@media (max-width: 991.98px) {
             .sidebar-admin {
                 position: relative;
                 width: 100%;
@@ -119,7 +147,7 @@
             }
         }
         
-        media (max-width: 768px) {
+        @@media (max-width: 768px) {
             .sidebar-admin {
                 position: fixed;
                 left: -280px;
@@ -162,6 +190,11 @@
                 <li class="nav-item">
                     <a href="@Url.Action("ListProducts", "Products", new { area = "Admin" })" class="nav-link @(currentController == "Products" ? "active" : "")">
                         <i class="fas fa-boxes"></i> Quản lý sản phẩm
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="@Url.Action("ListOrders", "Orders", new { area = "Admin" })" class="nav-link @(currentController == "Orders" ? "active" : "")">
+                        <i class="fas fa-shopping-cart"></i> Quản lý đơn hàng
                     </a>
                 </li>
                 <li class="nav-item">
