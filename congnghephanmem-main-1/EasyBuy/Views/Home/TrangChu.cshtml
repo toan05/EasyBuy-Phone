@@ -359,6 +359,185 @@
             color: white;
         }
 
+        .product-card-modern {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            border: none !important;
+            border-radius: 28px !important; 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+            padding: 12px !important; 
+            transition: all 0.35s ease;
+            position: relative !important;
+            display: flex !important;
+            flex-direction: column !important;
+            height: 100% !important;
+            color: #000000 !important; /* Ép màu chữ mặc định không bị lây màu xám/trắng */
+
+            position: relative !important;
+            overflow: visible !important;
+        }
+
+        .product-card-modern .product-image-container {
+            background: #ffffff !important;
+            background-color: #ffffff !important; /* Ép nền trắng tuyệt đối */
+            height: 220px !important;
+            width: 100% !important;
+            border: none !important; /* Xóa sạch mọi vạch kẻ đen */
+            outline: none !important;
+            border-radius: 20px !important; 
+            padding: 1.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: relative !important;
+            
+            /* Vẫn giữ hidden ở đây để ảnh khi hover phóng to không bị tràn ra ngoài viền bo tròn 20px của khung ảnh */
+            overflow: hidden !important;
+        }
+
+       .product-card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .product-card-modern .product-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        
+
+        .product-card-modern .product-image-container img {
+            background: #ffffff !important;
+            background-color: #ffffff !important; /* Phủ trắng những khoảng trống nếu ảnh bị lùn */
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            transition: transform 0.4s ease;
+        }
+        .product-card-modern:hover .product-image-container img {
+            transform: scale(1.05);
+        }
+
+        .product-card-modern .product-info {
+            padding: 1rem 0.5rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            align-items: center; /* Căn giữa toàn bộ */
+            text-align: center;
+        }
+
+        .product-card-modern .product-title {
+            color: #000000 !important;
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 0.8rem;
+            /* Giới hạn 2 dòng và thêm dấu ... */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-card-modern .product-price {
+            margin-top: auto;
+            padding-top: 0.75rem;
+            text-align: center !important; /* Căn giữa text */
+            width: 100%;
+
+        }
+        /* 4. Giá tiền: Màu xanh dương nổi bật */
+        .product-card-modern .price-current {
+            color: #0084ff !important; /* Xanh dương sáng */
+            font-size: 1.4rem !important;
+            font-weight: 800 !important;
+        }
+
+        .product-card-modern .price-old {
+            color: #9e9e9e;
+            text-decoration: line-through;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        .product-card-modern .product-price span.text-primary {
+            color: #0279f9 !important; /* Màu xanh lá chuẩn */
+            font-weight: 800 !important; /* Làm chữ cực dày (Extra Bold) */
+            font-size: 1.15rem !important; /* Phóng to chữ thêm một chút để nổi bật */
+            display: inline-block;
+        }
+
+        .product-card-modern .product-price span.text-muted {
+            font-weight: 500 !important;
+            display: inline-block;
+        }
+
+        .product-card-modern .wishlist-btn {
+            position: absolute !important;
+            top: 15px !important;
+            left: 15px !important;
+            background: #ffffff !important;
+            border: 1px solid #eaeaea !important;
+            border-radius: 50% !important;
+            width: 35px !important;
+            height: 35px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 5 !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+        }
+
+        /* 5. Nút Xem chi tiết */
+        .product-card-modern .btn-detail {
+            background-color: #0084ff !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 50px !important; 
+            padding: 8px 24px !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important;
+            margin-top: auto !important; /* Đẩy nút xuống sát đáy */
+            transition: all 0.2s ease;
+            width: max-content !important;
+            text-decoration: none !important;
+        }
+        .product-card-modern .btn-detail:hover {
+            background-color: #006bce;
+            color: white;
+        }
+        .product-card-modern .wishlist-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .product-card-modern .discount-badge-circle {
+            position: absolute !important;
+            top: -10px !important; /* Đẩy hẳn lên trên góc */
+            right: -10px !important; /* Đẩy hẳn ra lề phải */
+            background-color: #ff4757 !important;
+            color: #ffffff !important;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            font-weight: 700 !important;
+            font-size: 0.85rem !important;
+            line-height: 1.2 !important;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3) !important;
+            z-index: 10 !important;
+        }
+
         /* Custom Banner & Promo Styles */
         .banner-container {
             margin-bottom: 2rem;
@@ -636,30 +815,48 @@
                         @foreach (var item in products)
                         {
                             <div class="carousel-item-card">
-                                <div class="product-card-modern fade-in h-100">
-                                    <a href="/product/@item.ProductId" class="product-link">
-                                        <div class="product-image-container">
-                                            <img src="@(string.IsNullOrEmpty(item.ImagePr) ? "" : item.ImagePr.Split(';')[0])" alt="@item.ProductName" loading="lazy" />
+                                <div class="product-card-modern fade-in" data-product-id="@item.ProductId">
+    
+                                    @* Huy hiệu giảm giá hình tròn *@
+                                    @if (item.Discount > 0)
+                                    {
+                                        <div class="discount-badge-circle">
+                                            <span>Giảm</span>
+                                            <span>@item.Discount%</span>
                                         </div>
-                                        <div class="product-info">
-                                            <h3 class="product-title">@item.ProductName</h3>
-                                            <p class="product-description">@(item.Description?.Length > 80 ? item.Description.Substring(0, 80) + "..." : item.Description)</p>
-                                            <div class="product-price">
-                                                @if (item.Discount > 0)
-                                                {
-                                                    <span class="text-primary fw-bold">@string.Format("{0:N0}", item.SellingPrice - (item.SellingPrice * item.Discount / 100)) ₫</span>
-                                                    <span class="text-muted text-decoration-line-through small ms-2">@string.Format("{0:N0}", item.SellingPrice) ₫</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="text-primary fw-bold">@string.Format("{0:N0}", item.SellingPrice) ₫</span>
-                                                }
-                                            </div>
-                                        </div>
-                                    </a>
+                                    }
+
+                                    @* Nút yêu thích *@
                                     <button type="button" class="wishlist-btn" onclick="toggleWishlist(this, @item.ProductId)" title="Thêm vào yêu thích">
                                         <i class="far fa-heart"></i>
                                     </button>
+                                    
+                                    <a href="/product/@item.ProductId" class="text-decoration-none">
+                                        <div class="product-image-container">
+                                            <img src="@(string.IsNullOrEmpty(item.ImagePr) ? "" : item.ImagePr.Split(';')[0])" alt="@item.ProductName" loading="lazy" />
+                                        </div>
+                                    </a>
+
+                                    <div class="product-info">
+                                        <a href="/product/@item.ProductId" class="text-decoration-none w-100">
+                                            <h3 class="product-title">@item.ProductName</h3>
+                                        </a>
+                                        
+                                        @if (item.Discount > 0)
+                                        {
+                                            <div class="price-current">@string.Format("{0:N0}", item.SellingPrice * (1 - item.Discount / 100)) VND</div>
+                                            <div class="price-old">@string.Format("{0:N0}", item.SellingPrice) VND</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="price-current">@string.Format("{0:N0}", item.SellingPrice) VND</div>
+                                            <div class="price-old" style="visibility: hidden;">0 VND</div>
+                                        }
+
+                                        <a href="/product/@item.ProductId" class="btn btn-detail">
+                                            Xem chi tiết
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         }
@@ -683,14 +880,20 @@
             <div class="product-grid">
                 @foreach (var item in Model)
                 {
-                    <div class="product-card-modern fade-in">
+                    <div class="product-card-modern fade-in" data-product-id="@item.ProductId">
+                        @if (item.Discount > 0)
+                        {
+                            <div class="badge discount-badge">-@item.Discount%</div>
+                        }
+                        <button type="button" class="wishlist-btn" onclick="toggleWishlist(this, @item.ProductId)" title="Thêm vào yêu thích">
+                            <i class="far fa-heart"></i>
+                        </button>
                         <a href="/product/@item.ProductId" class="product-link">
                             <div class="product-image-container">
                                 <img src="@(string.IsNullOrEmpty(item.ImagePr) ? "" : item.ImagePr.Split(';')[0])" alt="@item.ProductName" loading="lazy" />
                             </div>
                             <div class="product-info">
                                 <h3 class="product-title">@item.ProductName</h3>
-                                <p class="product-description">@(item.Description?.Length > 80 ? item.Description.Substring(0, 80) + "..." : item.Description)</p>
                                 <div class="product-price">
                                     @if (item.Discount > 0)
                                     {
@@ -704,9 +907,6 @@
                                 </div>
                             </div>
                         </a>
-                        <button type="button" class="wishlist-btn" onclick="toggleWishlist(this, @item.ProductId)" title="Thêm vào yêu thích">
-                            <i class="far fa-heart"></i>
-                        </button>
                     </div>
                 }
             </div>
@@ -768,7 +968,7 @@ else
     RenderProductSection("🔥 Bán chạy nhất", ViewBag.TopSellingProducts as IEnumerable<EasyBuy.Models.Product>, "topselling=true");
     RenderProductSection("📱 Điện thoại", ViewBag.Phones as IEnumerable<EasyBuy.Models.Product>, "categoryName=Dien thoai");
     RenderProductSection("💻 Laptop", ViewBag.Laptops as IEnumerable<EasyBuy.Models.Product>, "categoryName=Laptop");
-    RenderProductSection("📟 Máy tính bảng", ViewBag.Tablets as IEnumerable<EasyBuy.Models.Product>, "categoryName=May tinh bang / ipad");
+    RenderProductSection("🖥️ Máy tính bảng", ViewBag.Tablets as IEnumerable<EasyBuy.Models.Product>, "categoryName=May tinh bang / ipad");
     RenderProductSection("🎧 Tai nghe & Phụ kiện", ViewBag.Accessories as IEnumerable<EasyBuy.Models.Product>, "categoryName=Phu kien");
 }
 

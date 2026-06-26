@@ -138,6 +138,30 @@
                             </div>
                         </div>
 
+                        <div class="card mb-4 border-info">
+                            <div class="card-header bg-info text-white">
+                                <i class="fas fa-layer-group me-2"></i>Biến thể sản phẩm (Màu sắc, Dung lượng, Giá)
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Màu sắc</th>
+                                            <th>Dung lượng</th>
+                                            <th>Giá biến thể</th>
+                                            <th>Tồn kho</th>
+                                            <th style="width: 50px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="variantsBody">
+                                        </tbody>
+                                </table>
+                                <button type="button" class="btn btn-sm btn-outline-info" onclick="addVariantRow()">
+                                    <i class="fas fa-plus me-1"></i>Thêm biến thể
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="d-flex justify-content-between">
                             <a href="@Url.Action("ListProducts", "Products", new { area = "Admin" })" class="btn btn-secondary">
                                 <i class="fas fa-arrow-left me-2"></i>Quay lại
@@ -158,4 +182,26 @@
     setTimeout(function() {
         $('.alert').fadeOut('slow');
     }, 5000);
+
+    let variantCount = 0;
+
+    function addVariantRow() {
+        const tbody = document.getElementById('variantsBody');
+        const newRow = document.createElement('tr');
+        
+        newRow.innerHTML = `
+            <td><input type="text" name="variants[${variantCount}].Color" class="form-control" placeholder="VD: Đen" required></td>
+            <td><input type="text" name="variants[${variantCount}].Storage" class="form-control" placeholder="VD: 128GB" required></td>
+            <td><input type="number" name="variants[${variantCount}].Price" class="form-control" placeholder="0" required></td>
+            <td><input type="number" name="variants[${variantCount}].Stock" class="form-control" placeholder="0" required></td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        
+        tbody.appendChild(newRow);
+        variantCount++;
+    }
 </script> 

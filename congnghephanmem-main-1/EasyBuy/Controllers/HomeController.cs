@@ -1,4 +1,4 @@
-﻿﻿﻿﻿/*using EasyBuy.Models;
+﻿﻿﻿﻿﻿﻿/*using EasyBuy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -147,61 +147,55 @@ namespace EasyBuy.Controllers
                 ViewBag.Categories = await _context.Categories.ToListAsync();
                 ViewBag.Brands = await _context.Brands.ToListAsync();
 
-                // Lấy danh sách sản phẩm kèm danh mục trực tiếp từ DB để đảm bảo có CategoryName
-                var productsWithCate = await _context.Products
+                // Tối ưu hóa: Xây dựng truy vấn bằng IQueryable thay vì tải tất cả vào bộ nhớ
+                var productsQuery = _context.Products
                     .Include(p => p.Cate)
                     .Where(p => p.StatusProduct != "hidden" && p.Quantity > 0)
-                    .ToListAsync();
-
-                var allProducts = (await _productRepository.GetAllAsync())
-                    .Where(p => p.StatusProduct != "hidden" && p.Quantity > 0);
+                    .AsQueryable();
 
                 if (!string.IsNullOrEmpty(search))
                 {
                     _logger.Log($"Tìm kiếm sản phẩm với từ khóa: {search}");
-                    allProducts = allProducts.Where(p => p.ProductName.Contains(search));
+                    var searchTerm = search.ToLower();
+                    // Tối ưu hóa: Tìm kiếm không phân biệt hoa thường và tìm cả trong mô tả, barcode
+                    productsQuery = productsQuery.Where(p => 
+                        p.ProductName.ToLower().Contains(searchTerm) ||
+                        (p.Description != null && p.Description.ToLower().Contains(searchTerm)) ||
+                        p.Barcode.ToLower().Contains(searchTerm)
+                    );
                 }
 
                 if (cate.HasValue)
                 {
-                    allProducts = allProducts.Where(p => p.CateId == cate.Value);
+                    productsQuery = productsQuery.Where(p => p.CateId == cate.Value);
                 }
 
                 if (brandId.HasValue)
                 {
-                    allProducts = allProducts.Where(p => p.BrandId == brandId.Value);
+                    productsQuery = productsQuery.Where(p => p.BrandId == brandId.Value);
                 }
 
                 if (!string.IsNullOrEmpty(categoryName))
                 {
                     var catSearch = categoryName.ToLower();
-                    var categoryMatchIds = productsWithCate
-                        .Where(p => p.Cate != null && (
-                            p.Cate.CategoryName.ToLower().Contains(catSearch) ||
-                            (catSearch.Contains("dien thoai") && p.Cate.CategoryName.ToLower().Contains("điện thoại")) ||
-                            (catSearch.Contains("may tinh bang") && p.Cate.CategoryName.ToLower().Contains("máy tính bảng")) ||
-                            (catSearch.Contains("phu kien") && p.Cate.CategoryName.ToLower().Contains("phụ kiện"))
-                        ))
-                        .Select(p => p.ProductId)
-                        .ToList();
-                    allProducts = allProducts.Where(p => categoryMatchIds.Contains(p.ProductId));
+                    productsQuery = productsQuery.Where(p => p.Cate != null && p.Cate.CategoryName.ToLower().Contains(catSearch));
                 }
 
                 if (isfeatured == true)
                 {
-                    allProducts = allProducts.Where(p => p.IsFeatured == true);
+                    productsQuery = productsQuery.Where(p => p.IsFeatured == true);
                 }
 
                 if (topselling == true)
                 {
-                    allProducts = allProducts.OrderByDescending(p => p.ViewCount);
+                    productsQuery = productsQuery.OrderByDescending(p => p.ViewCount);
                 }
                 else
                 {
-                    allProducts = allProducts.OrderByDescending(p => p.UpdatedAt);
+                    productsQuery = productsQuery.OrderByDescending(p => p.UpdatedAt);
                 }
 
-                var productList = allProducts.ToList();
+                var productList = await productsQuery.ToListAsync();
 
                 if (minPrice.HasValue)
                 {
@@ -222,22 +216,27 @@ namespace EasyBuy.Controllers
                 ViewBag.CurrentPage = page;
                 ViewBag.TotalPages = totalPages;
 
+                // Lấy dữ liệu cho các section một cách hiệu quả hơn
+                var allVisibleProducts = await _context.Products
+                    .Include(p => p.Cate)
+                    .Where(p => p.StatusProduct != "hidden" && p.Quantity > 0)
+                    .ToListAsync();
+
                 // Thêm dữ liệu cho các mục sản phẩm phân loại trên trang chủ
-                ViewBag.FeaturedProducts = productsWithCate
+                ViewBag.FeaturedProducts = allVisibleProducts
                     .Where(p => p.IsFeatured == true)
                     .OrderByDescending(p => p.UpdatedAt)
                     .Take(8)
                     .ToList();
 
-                ViewBag.TopSellingProducts = productsWithCate
+                ViewBag.TopSellingProducts = allVisibleProducts
                     .OrderByDescending(p => p.ViewCount)
                     .Take(8)
                     .ToList();
 
-                ViewBag.Phones = productsWithCate
+                ViewBag.Phones = allVisibleProducts
                     .Where(p => p.Cate != null && (
                         p.Cate.CategoryName.ToLower().Contains("điện thoại") || 
-                        p.Cate.CategoryName.ToLower().Contains("dien thoai") ||
                         p.Cate.CategoryName.ToLower().Contains("phone") ||
                         p.Cate.CategoryName.ToLower().Contains("smartphone")
                     ))
@@ -245,10 +244,9 @@ namespace EasyBuy.Controllers
                     .Take(8)
                     .ToList();
 
-                ViewBag.Tablets = productsWithCate
+                ViewBag.Tablets = allVisibleProducts
                     .Where(p => p.Cate != null && (
                         p.Cate.CategoryName.ToLower().Contains("máy tính bảng") || 
-                        p.Cate.CategoryName.ToLower().Contains("may tinh bang") || 
                         p.Cate.CategoryName.ToLower().Contains("ipad") ||
                         p.Cate.CategoryName.ToLower().Contains("tablet")
                     ))
@@ -256,7 +254,7 @@ namespace EasyBuy.Controllers
                     .Take(8)
                     .ToList();
 
-                ViewBag.Laptops = productsWithCate
+                ViewBag.Laptops = allVisibleProducts
                     .Where(p => p.Cate != null && (
                         p.Cate.CategoryName.ToLower().Contains("laptop") ||
                         p.Cate.CategoryName.ToLower().Contains("máy tính xách tay")
@@ -265,10 +263,9 @@ namespace EasyBuy.Controllers
                     .Take(8)
                     .ToList();
 
-                ViewBag.Accessories = productsWithCate
+                ViewBag.Accessories = allVisibleProducts
                     .Where(p => p.Cate != null && (
                         p.Cate.CategoryName.ToLower().Contains("phụ kiện") || 
-                        p.Cate.CategoryName.ToLower().Contains("phu kien") ||
                         p.Cate.CategoryName.ToLower().Contains("tai nghe") ||
                         p.Cate.CategoryName.ToLower().Contains("sạc") ||
                         p.Cate.CategoryName.ToLower().Contains("ốp")
@@ -334,10 +331,11 @@ namespace EasyBuy.Controllers
             {
                 _logger.Log($"Xem chi tiết sản phẩm ID: {productId}");
 
-                var userId = HttpContext.Session.GetInt32("UserID");
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                int? userId = userIdClaim != null && int.TryParse(userIdClaim.Value, out int id) ? id : null;
 
                 var detail = await _context.Products
-                    .Include(p => p.Ratings!.Where(r => r.IsApproved == true))
+                    .Include(p => p.Ratings.Where(r => r.IsApproved == true))
  .ThenInclude(r => r.User)
                     .FirstOrDefaultAsync(p => p.ProductId == productId);
 

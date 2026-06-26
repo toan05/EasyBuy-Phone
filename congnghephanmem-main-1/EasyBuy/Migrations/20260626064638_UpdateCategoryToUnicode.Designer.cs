@@ -4,6 +4,7 @@ using EasyBuy.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EasyBuy.Migrations
 {
     [DbContext(typeof(EasyBuyContext))]
-    partial class EasyBuyContextModelSnapshot : ModelSnapshot
+    [Migration("20260626064638_UpdateCategoryToUnicode")]
+    partial class UpdateCategoryToUnicode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -572,41 +575,6 @@ namespace EasyBuy.Migrations
                     b.ToTable("Product", (string)null);
                 });
 
-            modelBuilder.Entity("EasyBuy.Models.ProductVariant", b =>
-                {
-                    b.Property<int>("VariantId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VariantId"));
-
-                    b.Property<string>("Color")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Sku")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int?>("Stock")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Storage")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("VariantId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductVariant");
-                });
-
             modelBuilder.Entity("EasyBuy.Models.Rating", b =>
                 {
                     b.Property<int>("RatingId")
@@ -1039,17 +1007,6 @@ namespace EasyBuy.Migrations
                     b.Navigation("Cate");
                 });
 
-            modelBuilder.Entity("EasyBuy.Models.ProductVariant", b =>
-                {
-                    b.HasOne("EasyBuy.Models.Product", "Product")
-                        .WithMany("ProductVariants")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("EasyBuy.Models.Rating", b =>
                 {
                     b.HasOne("EasyBuy.Models.Product", "Product")
@@ -1152,8 +1109,6 @@ namespace EasyBuy.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("ProductVariants");
 
                     b.Navigation("Ratings");
 

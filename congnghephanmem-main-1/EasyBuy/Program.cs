@@ -1,4 +1,4 @@
-﻿﻿using EasyBuy.Models;
+﻿﻿﻿﻿using EasyBuy.Models;
 using EasyBuy.Models.MOMO;
 using EasyBuy.Library;
 using EasyBuy.Services.AUTH;
@@ -43,7 +43,6 @@ builder.Services.AddDbContext<EasyBuyContext>(options =>
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<LearningService>();
 builder.Services.AddScoped<SimpleChatService>();
 builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
@@ -75,21 +74,32 @@ builder.Services.AddSession(options => {
     options.Cookie.IsEssential = true;
 });
 
-builder.Services.AddAuthentication(options => {
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-})
-.AddCookie(options => {
-    options.LoginPath = "/Account/Login";
-    options.LogoutPath = "/Account/Logout";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-})
-.AddGoogle(options => {
-    options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value ?? string.Empty;
-    options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value ?? string.Empty;
-    options.CallbackPath = "/signin-google"; // Thêm để đảm bảo login Google ko lỗi
-});
+builder.Services.AddAuthentication()
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => {
+        options.Cookie.Name = ".EasyBuy.Customer";
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true;
+    })
+    .AddCookie("AdminScheme", options =>
+    {
+        options.Cookie.Name = ".EasyBuy.Admin";
+        options.LoginPath = "/Admin/Login/Index";
+        options.LogoutPath = "/Admin/Login/Logout";
+        options.AccessDeniedPath = "/Admin/Login/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.SlidingExpiration = true;
+    })
+    .AddGoogle(GoogleDefaults.AuthenticationScheme, options => {
+        options.ClientId = builder.Configuration.GetSection("GoogleKeys:ClientId").Value ?? string.Empty;
+        options.ClientSecret = builder.Configuration.GetSection("GoogleKeys:ClientSecret").Value ?? string.Empty;
+        options.CallbackPath = "/signin-google";
+        // Chỉ định scheme để lưu cookie sau khi đăng nhập Google thành công
+        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    });
+
+
 
 var app = builder.Build();
 

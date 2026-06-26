@@ -41,6 +41,8 @@ public partial class EasyBuyContext : DbContext
 
     public virtual DbSet<Product> Products { get; set; }
 
+    public virtual DbSet<ProductVariant> ProductVariants { get; set; } // <--- THÊM DÒNG NÀY VÀO
+
     public virtual DbSet<Rating> Ratings { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -161,7 +163,7 @@ public partial class EasyBuyContext : DbContext
             entity.Property(e => e.CateId).HasColumnName("CateID");
             entity.Property(e => e.CategoryName)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Feedback>(entity =>
@@ -310,6 +312,19 @@ public partial class EasyBuyContext : DbContext
         modelBuilder.Entity<Product>()
     .HasIndex(p => p.Barcode)
     .IsUnique();
+
+        modelBuilder.Entity<ProductVariant>(entity =>
+        {
+            entity.HasKey(e => e.VariantId);
+            entity.Property(e => e.Sku).HasMaxLength(50);
+            
+            // Thêm dòng này để xử lý cảnh báo decimal
+            entity.Property(e => e.Price).HasPrecision(18, 2); 
+            
+            entity.HasOne(d => d.Product).WithMany(p => p.ProductVariants)
+                .HasForeignKey(d => d.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
 
         modelBuilder.Entity<Rating>(entity =>

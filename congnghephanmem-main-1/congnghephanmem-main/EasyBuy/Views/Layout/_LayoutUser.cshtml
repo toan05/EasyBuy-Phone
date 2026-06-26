@@ -42,7 +42,8 @@
                 </div>
 
                 <!-- Search Bar -->
-                <div class="flex-grow-1 mx-4 d-none d-md-block position-relative"> @using (Html.BeginForm("TrangChu", "Home", FormMethod.Post, new { @class = "d-flex", id="searchForm" }))
+                <div class="flex-grow-1 mx-4 d-none d-md-block position-relative"> 
+                    @using (Html.BeginForm("TrangChu", "Home", FormMethod.Get, new { @class = "d-flex", id="searchForm" }))
                     {
                         <div class="input-group">
                             <input type="text" id="searchInput" name="search" class="form-control border-end-0"
@@ -88,13 +89,15 @@
 
 
                     <!-- User Menu -->
-                    @if (Context.Session.GetInt32("UserID") != null)
+                    @if (User.Identity.IsAuthenticated && User.Identity.AuthenticationType == CookieAuthenticationDefaults.AuthenticationScheme)
                     {
+                        var userName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Tài khoản";
+
                         <div class="dropdown">
                             <button class="btn text-dark d-flex flex-column align-items-center nav-item border-0 bg-transparent dropdown-toggle"
                                     type="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle fs-5 mb-1"></i>
-                                <small>@Context.Session.GetString("Phone")</small>
+                                <small>@userName</small>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
@@ -180,12 +183,14 @@
                         </div>
                     </div>
 
-                    @if (Context.Session.GetInt32("UserID") != null)
+                    @if (User.Identity.IsAuthenticated && User.Identity.AuthenticationType == CookieAuthenticationDefaults.AuthenticationScheme)
                     {
+                        var mobileUserName = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "Tài khoản";
+
                         <div class="border-top pt-2">
                             <div class="text-center mb-2">
                                 <i class="fas fa-user-circle text-primary fs-3"></i>
-                                <p class="mb-1 fw-bold">@Context.Session.GetString("Phone")</p>
+                                <p class="mb-1 fw-bold">@mobileUserName</p>
                             </div>
                             <div class="row g-1">
                                 <div class="col-6">
