@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using EasyBuy.Models;
+﻿﻿﻿﻿﻿﻿using EasyBuy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -702,13 +702,13 @@ namespace EasyBuy.Controllers
                     }
 
                     // Đăng nhập thành công bằng CustomerScheme
-                    var claims = new List<Claim>
+                    var loginClaims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, existingUser.Email),
                         new Claim(ClaimTypes.NameIdentifier, existingUser.UserId.ToString()),
                         new Claim(ClaimTypes.Role, existingUser.Role)
                     };
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    var claimsIdentity = new ClaimsIdentity(loginClaims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties { IsPersistent = true });
 
                     existingUser.FailedLoginCount = 0;
@@ -761,7 +761,7 @@ namespace EasyBuy.Controllers
         }
 
         [HttpPost]
-        public IActionResult SetPassword(string password, string confirmPassword)
+        public async Task<IActionResult> SetPassword(string password, string confirmPassword)
         {
             try
             {

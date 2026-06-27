@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿/*using EasyBuy.Models;
+﻿﻿﻿﻿﻿﻿﻿﻿/*using EasyBuy.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
@@ -144,8 +144,17 @@ namespace EasyBuy.Controllers
             {
                 _logger.Log("Truy cập Trang Chủ - Đang tải danh sách sản phẩm.");
 
-                ViewBag.Categories = await _context.Categories.ToListAsync();
-                ViewBag.Brands = await _context.Brands.ToListAsync();
+                // Lấy danh sách danh mục và sắp xếp theo thứ tự tùy chỉnh
+                var categoryOrder = new List<string> { "Laptop", "Điện thoại", "Máy tính bảng", "Tai nghe", "Phụ kiện" };
+                var allCategories = await _context.Categories.ToListAsync();
+                var orderedCategories = allCategories
+                    .OrderBy(c => categoryOrder.IndexOf(c.CategoryName))
+                    .ThenBy(c => c.CategoryName) // Sắp xếp các mục còn lại theo Alphabet
+                    .ToList();
+
+                ViewBag.Categories = orderedCategories;
+                ViewBag.Brands = await _context.Brands.ToListAsync(); // Giữ nguyên
+
 
                 // Tối ưu hóa: Xây dựng truy vấn bằng IQueryable thay vì tải tất cả vào bộ nhớ
                 var productsQuery = _context.Products
@@ -246,9 +255,7 @@ namespace EasyBuy.Controllers
 
                 ViewBag.Tablets = allVisibleProducts
                     .Where(p => p.Cate != null && (
-                        p.Cate.CategoryName.ToLower().Contains("máy tính bảng") || 
-                        p.Cate.CategoryName.ToLower().Contains("ipad") ||
-                        p.Cate.CategoryName.ToLower().Contains("tablet")
+                        p.Cate.CategoryName.ToLower() == "máy tính bảng"
                     ))
                     .OrderByDescending(p => p.UpdatedAt)
                     .Take(8)

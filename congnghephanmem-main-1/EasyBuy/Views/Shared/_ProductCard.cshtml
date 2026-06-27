@@ -1,0 +1,43 @@
+@model EasyBuy.Models.Product
+
+<div class="product-card-modern fade-in h-100" data-product-id="@Model.ProductId">
+
+    @* Huy hiệu giảm giá hình tròn *@
+    @if (Model.Discount > 0)
+    {
+        <div class="discount-badge-circle">
+            <span>Giảm</span>
+            <span>@Model.Discount%</span>
+        </div>
+    }
+
+    @* Nút yêu thích *@
+    <button type="button" class="wishlist-btn" onclick="toggleWishlist(this, @Model.ProductId)" title="Thêm vào yêu thích">
+        <i class="far fa-heart"></i>
+    </button>
+
+    <a href="/product/@Model.ProductId" class="text-decoration-none">
+        <div class="product-image-container">
+            <img src="@(string.IsNullOrEmpty(Model.ImagePr) ? "/images/default-product.png" : Model.ImagePr.Split(';')[0])" alt="@Model.ProductName" loading="lazy" />
+        </div>
+    </a>
+
+    <div class="product-info">
+        <a href="/product/@Model.ProductId" class="text-decoration-none w-100">
+            <h3 class="product-title">@Model.ProductName</h3>
+        </a>
+
+        @if (Model.Discount > 0)
+        {
+            <div class="price-current">@string.Format("{0:N0}", Model.SellingPrice * (1 - Model.Discount / 100)) VND</div>
+            <div class="price-old">@string.Format("{0:N0}", Model.SellingPrice) VND</div>
+        }
+        else
+        {
+            <div class="price-current">@string.Format("{0:N0}", Model.SellingPrice) VND</div>
+            <div class="price-old" style="visibility: hidden;">0 VND</div>
+        }
+
+        <a href="/product/@Model.ProductId" class="btn btn-detail">Xem chi tiết</a>
+    </div>
+</div>

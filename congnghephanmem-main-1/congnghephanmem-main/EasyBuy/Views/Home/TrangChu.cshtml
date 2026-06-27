@@ -1,4 +1,4 @@
-﻿@using EasyBuy.Models
+﻿﻿@using EasyBuy.Models
 @model IEnumerable<Product> 
 
 @{
@@ -214,18 +214,6 @@
             margin-bottom: 2rem;
             text-align: center;
             position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: var(--primary-gradient);
-            border-radius: 2px;
         }
         
         .fade-in {

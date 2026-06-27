@@ -175,15 +175,6 @@
     </script>
     
     <style>
-        .filter-section {
-            background: white;
-            padding: 2rem;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow);
-            margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
-        }
-        
         .section-title {
             font-size: 2rem;
             font-weight: 700;
@@ -191,27 +182,6 @@
             margin-bottom: 2rem;
             text-align: center;
             position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: var(--primary-gradient);
-            border-radius: 2px;
-        }
-        
-        /* Điều chỉnh tiêu đề khi nằm cùng hàng với nút Xem tất cả */
-        .section-header-flex .section-title {
-            margin-bottom: 0;
-        }
-        .section-header-flex .section-title::after {
-            left: 0;
-            transform: none;
         }
         
         .fade-in {
@@ -564,6 +534,74 @@
             align-items: center;
             justify-content: center;
         }
+            
+            /* --- Category Pill Section --- */
+            .category-pill-container {
+                background: white;
+                border-radius: 50px;
+                padding: 1.5rem 1rem; /* Tăng padding trên dưới, giảm trái phải */
+                box-shadow: 0px 0px 8.3px 5px rgba(0, 0, 0, 0.05); /* Shadow từ Figma */
+                margin: 2.5rem auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-around; /* Tự động căn đều khoảng cách */
+                gap: 1rem; /* Giảm khoảng cách mặc định một chút */
+                overflow-x: auto;
+                /* Hide scrollbar */
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none;  /* IE and Edge */
+            }
+            .category-pill-container::-webkit-scrollbar {
+                display: none; /* Chrome, Safari, Opera */
+            }
+
+            .category-item-pill {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                color: #555;
+                transition: all 0.2s ease-in-out;
+                flex-shrink: 0; /* Ngăn các item bị co lại */
+            }
+
+            .category-item-pill:hover {
+                transform: translateY(-5px);
+            }
+
+            .category-item-pill:hover .category-pill-name {
+                color: var(--primary-color, #0d6efd);
+            }
+
+            .category-pill-image-wrapper {
+                width: 75px; /* Tăng kích thước ảnh */
+                height: 75px;
+                margin-bottom: 0.5rem;
+            }
+
+            .category-pill-image-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+
+            .category-pill-name {
+                font-size: 1rem; /* 16px */
+                font-weight: 500;
+                text-align: center;
+                transition: color 0.2s ease-in-out;
+                color: #000000;
+            }
+
+            @@media (max-width: 768px) {
+                .category-pill-container {
+                    padding: 0.75rem;
+                    gap: 1.5rem; /* Tăng khoảng cách trên mobile */
+                    justify-content: flex-start; /* Bắt đầu từ lề trái */
+                }
+            }
+
         @@media (max-width: 768px) {
             .carousel-item img { height: 250px; }
         }
@@ -635,154 +673,85 @@
         </button>
     </div>
 
-    <!-- Promo Cards (Cart khuyến mãi) -->
-    <div class="row g-3 mb-2">
-        <div class="col-lg-3 col-md-6">
-            <div class="promo-card bg-primary-subtle rounded-4 p-3 d-flex align-items-center h-100 shadow-sm">
-                <div class="promo-icon-wrap bg-primary text-white rounded-circle me-3 flex-shrink-0">
-                    <i class="fas fa-shipping-fast fs-4"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1">Miễn phí vận chuyển</h6>
-                    <p class="text-muted mb-0 small">Cho đơn hàng từ 500K</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="promo-card bg-danger-subtle rounded-4 p-3 d-flex align-items-center h-100 shadow-sm">
-                <div class="promo-icon-wrap bg-danger text-white rounded-circle me-3 flex-shrink-0">
-                    <i class="fas fa-tags fs-4"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1">Voucher giảm giá</h6>
-                    <p class="text-muted mb-0 small">Mã giảm lên tới 1 Triệu</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="promo-card bg-success-subtle rounded-4 p-3 d-flex align-items-center h-100 shadow-sm">
-                <div class="promo-icon-wrap bg-success text-white rounded-circle me-3 flex-shrink-0">
-                    <i class="fas fa-shield-alt fs-4"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1">Bảo hành chính hãng</h6>
-                    <p class="text-muted mb-0 small">1 đổi 1 trong 30 ngày đầu</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6">
-            <div class="promo-card bg-warning-subtle rounded-4 p-3 d-flex align-items-center h-100 shadow-sm">
-                <div class="promo-icon-wrap bg-warning text-dark rounded-circle me-3 flex-shrink-0">
-                    <i class="fas fa-headset fs-4"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold mb-1">Hỗ trợ 24/7</h6>
-                    <p class="text-muted mb-0 small">Hotline: 1900 1234</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Filter Section -->
-<section class="filter-section">
-    <h4 class="mb-3"><i class="fas fa-filter me-2"></i>Bộ lọc sản phẩm</h4>
     
-    @* Đưa phần khai báo biến ra ngoài cùng để tránh xung đột ngữ cảnh C# *@
-    @{
-        var categories = ViewBag.Categories as List<EasyBuy.Models.Category> ?? new List<EasyBuy.Models.Category>();
-        var brands = ViewBag.Brands as List<EasyBuy.Models.Brand> ?? new List<EasyBuy.Models.Brand>();
-    }
-
-    @using (Html.BeginForm("TrangChu", "Home", FormMethod.Get, new { @class = "filter-form" }))
-    {
-        <div class="filter-row"> 
-            <div class="form-group">
-                <label class="form-label">Danh mục</label>
-                <select name="cate" class="form-control">
-                    <option value="">Tất cả danh mục</option>
-                    @foreach (var c in categories)
-                    {
-                        if (Context.Request.Query["cate"] == c.CateId.ToString())
-                        {
-                            <option value="@c.CateId" selected>@c.CategoryName</option>
-                        }
-                        else
-                        {
-                            <option value="@c.CateId">@c.CategoryName</option>
-                        }
-                    }
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Thương hiệu</label>
-                <select name="brandId" class="form-control">
-                    <option value="">Tất cả thương hiệu</option>
-                    @foreach (var b in brands)
-                    {
-                        if (Context.Request.Query["brandId"] == b.BrandId.ToString())
-                        {
-                            <option value="@b.BrandId" selected>@b.NameBrand</option>
-                        }
-                        else
-                        {
-                            <option value="@b.BrandId">@b.NameBrand</option>
-                        }
-                    }
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Giá từ</label>
-                <input type="number" name="minPrice" class="form-control" placeholder="0" value="@Context.Request.Query["minPrice"]" />
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Giá đến</label>
-                <input type="number" name="maxPrice" class="form-control" placeholder="10000000" value="@Context.Request.Query["maxPrice"]" />
-            </div>
-            
-            <div class="form-group align-self-end">
-                <button type="submit" class="btn btn-primary w-100">
-                    <i class="fas fa-search me-2"></i>Áp dụng bộ lọc
-                </button>
-            </div>
-        </div>
-    }
 </section>
 
-<!-- Stats Section -->
-<section class="stats-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-3 col-6">
-                <div class="stat-item">
-                    <span class="stat-number">10K+</span>
-                    <span class="stat-label">Sản phẩm</span>
-                </div>
+<!-- Category Pill Section -->
+<section class="category-pill-section">
+    @{
+        // Hàm helper để chuẩn hóa tên file ảnh từ tên danh mục
+        string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            string normalizedString = text.Normalize(System.Text.NormalizationForm.FormD);
+            var stringBuilder = new System.Text.StringBuilder();
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
+
+        string NormalizeFileName(string name)
+        {
+            string noDiacritics = RemoveDiacritics(name);
+            // Thêm bước thay thế 'đ' thành 'd' và chuẩn hóa
+            return System.Text.RegularExpressions.Regex.Replace(noDiacritics.ToLower().Replace('đ', 'd'), @"[^a-z0-9]+", "-").Trim('-');
+        }
+    }
+    <div class="category-pill-container">
+        @* --- BẮT ĐẦU KHỐI MÃ TĨNH --- *@
+        @* Đoạn mã này đã được chuyển từ động sang tĩnh để bạn có thể chỉnh sửa chi tiết. *@
+        @* Lưu ý: Mọi thay đổi trong DB sẽ không tự cập nhật ở đây. *@
+
+        <a href="/Home/TrangChu?cate=7" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                <img src="/images/design_shop/laptop.png" alt="Laptop" onerror="this.src='/images/design_shop/default.png'" loading="lazy">
             </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-item">
-                    <span class="stat-number">50K+</span>
-                    <span class="stat-label">Khách hàng</span>
-                </div>
+            <span class="category-pill-name">
+                Laptop
+            </span>
+        </a>
+        <a href="/Home/TrangChu?cate=1" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                <img src="/images/design_shop/dien-thoai.png" alt="Điện thoại" onerror="this.src='/images/design_shop/default.png'" loading="lazy" style="padding: 5px;">
             </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-item">
-                    <span class="stat-number">100+</span>
-                    <span class="stat-label">Thương hiệu</span>
-                </div>
+            <span class="category-pill-name">
+                Điện thoại
+            </span>
+        </a>
+        <a href="/Home/TrangChu?cate=2" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                @* Đã sửa lại đường dẫn ảnh cho Máy tính bảng *@
+                <img src="/images/design_shop/may-tinh-bang.png" alt="Máy tính bảng" onerror="this.src='/images/design_shop/default.png'" loading="lazy" style="padding: 8px;">
             </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-item">
-                    <span class="stat-number">24/7</span>
-                    <span class="stat-label">Hỗ trợ</span>
-                </div>
+            <span class="category-pill-name">
+                Máy tính bảng
+            </span>
+        </a>
+        <a href="/Home/TrangChu?cate=5" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                <img src="/images/design_shop/tai-nghe.png" alt="Tai nghe" onerror="this.src='/images/design_shop/default.png'" loading="lazy" style="padding: 5px;">
             </div>
-        </div>
+            <span class="category-pill-name">
+                Tai nghe
+            </span>
+        </a>
+        <a href="/Home/TrangChu?cate=6" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                <img src="/images/design_shop/phu-kien.png" alt="Phụ kiện" onerror="this.src='/images/design_shop/default.png'" loading="lazy">
+            </div>
+            <span class="category-pill-name">
+                Phụ kiện
+            </span>
+        </a>
     </div>
 </section>
+
 
 <!-- Products Section -->
 @{
@@ -795,28 +764,33 @@
                           !string.IsNullOrEmpty(Context.Request.Query["isfeatured"]) ||
                           !string.IsNullOrEmpty(Context.Request.Query["topselling"]) ||
                           !string.IsNullOrEmpty(Context.Request.Query["page"]);
-
-    void RenderProductSection(string sectionTitle, IEnumerable<EasyBuy.Models.Product> products, string queryString)
+    
+    // Thêm tham số 'lightTitle' vào hàm
+    async Task RenderProductSection(string boldTitle, string lightTitle, IEnumerable<Product> products, string queryString)
     {
         if (products != null && products.Any())
         {
-            <section class="mt-5">
-                <div class="d-flex justify-content-between align-items-center mb-4 section-header-flex">
-                    <h2 class="section-title text-start">@sectionTitle</h2>
-                    <a href="/Home/TrangChu?@queryString" class="text-decoration-none fw-bold" style="color: var(--primary-color, #0d6efd);">Xem tất cả <i class="fas fa-angle-right ms-1"></i></a>
-                </div>
-                
-                <div class="carousel-container">
-                    <button type="button" class="btn carousel-control prev" onclick="scrollProductCarousel(this, 'left')">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
+            <section class="category-section mt-5 mb-5">
+                <div class="container">
                     
-                    <div class="product-carousel-track">
+                    <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap">
+                        <div class="d-flex align-items-baseline flex-wrap">
+                            <h3 class="fw-bold mb-0" style="font-size: 28px; color: #1d1d1f; letter-spacing: -0.5px;">@boldTitle</h3>
+                            <h3 class="fw-medium mb-0 ms-2" style="font-size: 28px; color: #86868b; letter-spacing: -0.5px;">@lightTitle</h3>
+                        </div>
+                        
+                        <a href="/Home/TrangChu?@queryString" class="text-decoration-none text-dark mt-2 mt-md-0" style="font-size: 15px; font-weight: 500;">
+                            Xem tất cả <i class="fas fa-chevron-right ms-1" style="font-size: 13px;"></i>
+                        </a>
+                    </div>
+                    <div class="row">
                         @foreach (var item in products)
                         {
-                            <div class="carousel-item-card">
-                                <div class="product-card-modern fade-in" data-product-id="@item.ProductId">
-    
+                            <div class="col-6 col-md-4 col-lg-3 mb-4">
+                                @await Html.PartialAsync("_ProductCard", item)
+                                @* --- ĐÃ MỞ MÃ NGUỒN CỦA THẺ SẢN PHẨM TẠI ĐÂY --- *@
+                                <div class="product-card-modern fade-in h-100" data-product-id="@item.ProductId">
+
                                     @* Huy hiệu giảm giá hình tròn *@
                                     @if (item.Discount > 0)
                                     {
@@ -830,10 +804,10 @@
                                     <button type="button" class="wishlist-btn" onclick="toggleWishlist(this, @item.ProductId)" title="Thêm vào yêu thích">
                                         <i class="far fa-heart"></i>
                                     </button>
-                                    
+
                                     <a href="/product/@item.ProductId" class="text-decoration-none">
                                         <div class="product-image-container">
-                                            <img src="@(string.IsNullOrEmpty(item.ImagePr) ? "" : item.ImagePr.Split(';')[0])" alt="@item.ProductName" loading="lazy" />
+                                            <img src="@(string.IsNullOrEmpty(item.ImagePr) ? "/images/default-product.png" : item.ImagePr.Split(';')[0])" alt="@item.ProductName" loading="lazy" />
                                         </div>
                                     </a>
 
@@ -841,30 +815,16 @@
                                         <a href="/product/@item.ProductId" class="text-decoration-none w-100">
                                             <h3 class="product-title">@item.ProductName</h3>
                                         </a>
-                                        
-                                        @if (item.Discount > 0)
-                                        {
-                                            <div class="price-current">@string.Format("{0:N0}", item.SellingPrice * (1 - item.Discount / 100)) VND</div>
-                                            <div class="price-old">@string.Format("{0:N0}", item.SellingPrice) VND</div>
-                                        }
-                                        else
-                                        {
-                                            <div class="price-current">@string.Format("{0:N0}", item.SellingPrice) VND</div>
-                                            <div class="price-old" style="visibility: hidden;">0 VND</div>
-                                        }
 
-                                        <a href="/product/@item.ProductId" class="btn btn-detail">
-                                            Xem chi tiết
-                                        </a>
+                                        <div class="price-current">@string.Format("{0:N0}", item.SellingPrice * (1 - (item.Discount ?? 0) / 100)) VND</div>
+                                        <div class="price-old" style="@(item.Discount > 0 ? "" : "visibility: hidden;")">@string.Format("{0:N0}", item.SellingPrice) VND</div>
+
+                                        <a href="/product/@item.ProductId" class="btn btn-detail">Xem chi tiết</a>
                                     </div>
                                 </div>
                             </div>
                         }
                     </div>
-                    
-                    <button type="button" class="btn carousel-control next" onclick="scrollProductCarousel(this, 'right')">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
                 </div>
             </section>
         }
@@ -964,12 +924,12 @@
 }
 else
 {
-    RenderProductSection("🌟 Sản phẩm nổi bật", ViewBag.FeaturedProducts as IEnumerable<EasyBuy.Models.Product>, "isfeatured=true");
-    RenderProductSection("🔥 Bán chạy nhất", ViewBag.TopSellingProducts as IEnumerable<EasyBuy.Models.Product>, "topselling=true");
-    RenderProductSection("📱 Điện thoại", ViewBag.Phones as IEnumerable<EasyBuy.Models.Product>, "categoryName=Dien thoai");
-    RenderProductSection("💻 Laptop", ViewBag.Laptops as IEnumerable<EasyBuy.Models.Product>, "categoryName=Laptop");
-    RenderProductSection("🖥️ Máy tính bảng", ViewBag.Tablets as IEnumerable<EasyBuy.Models.Product>, "categoryName=May tinh bang / ipad");
-    RenderProductSection("🎧 Tai nghe & Phụ kiện", ViewBag.Accessories as IEnumerable<EasyBuy.Models.Product>, "categoryName=Phu kien");
+    await RenderProductSection("Sản phẩm nổi bật.", "Tinh hoa hội tụ.", ViewBag.FeaturedProducts as IEnumerable<Product>, "isfeatured=true");
+    await RenderProductSection("Đang gây bão.", "Sự lựa chọn của số đông.", ViewBag.TopSellingProducts as IEnumerable<Product>, "topselling=true");
+    await RenderProductSection("Smartphone đỉnh cao.", "Cả thế giới thu bé vừa bằng lòng bàn tay.", ViewBag.Phones as IEnumerable<Product>, "categoryName=Dien thoai");
+    await RenderProductSection("Laptop.", "Hiệu năng bứt phá. Sẵn sàng cho mọi ý tưởng.", ViewBag.Laptops as IEnumerable<Product>, "categoryName=Laptop");
+    await RenderProductSection("Máy tính bảng.", "Mỏng nhẹ tuyệt đối. Sáng tạo vô hạn.", ViewBag.Tablets as IEnumerable<Product>, "categoryName=May tinh bang");
+    await RenderProductSection("Phụ kiện.", "Mảnh ghép hoàn hảo. Nâng tầm trải nghiệm.", ViewBag.Accessories as IEnumerable<Product>, "categoryName=Phu kien");
 }
 
 <!-- Newsletter Section -->
