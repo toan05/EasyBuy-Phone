@@ -342,4 +342,4 @@
 /Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/obj/Debug/net9.0/osx-arm64/EasyBuy.pdb
 /Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/obj/Debug/net9.0/osx-arm64/EasyBuy.genruntimeconfig.cache
 /Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/obj/Debug/net9.0/osx-arm64/ref/EasyBuy.dll
-/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/obj/Debug/net9.0/osx-arm64/compressed/rnh7flu9a7-{0}-s39fpbz90x-s39fpbz90x.gz
+/Users/hatoan0508/Documents/GitHub/Shop Bán Điện Thoại/congnghephanmem-main-1/EasyBuy/obj/Debug/net9.0/osx-arm64/compressed/rnh7flu9a7-{0}-kwy6kpu1rx-kwy6kpu1rx.gz

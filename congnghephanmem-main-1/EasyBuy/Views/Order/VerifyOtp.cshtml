@@ -1,4 +1,4 @@
-﻿@{
+﻿﻿@{
     ViewData["Title"] = "Xác minh OTP";
     Layout = "~/Views/Layout/_LayoutUser.cshtml";
 }
@@ -73,33 +73,25 @@
                     </form>
 
                     <div class="text-center mb-3">
-                        @using (Html.BeginForm("ResendOtp", "Order", FormMethod.Post, new { style = "display:inline;" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <button type="submit"
-                                    class="btn btn-outline-secondary"
-                                    id="resendBtn"
-                                    aria-label="Gửi lại mã OTP đến email">
-                                <i class="fas fa-paper-plane" aria-hidden="true"></i> Gửi lại OTP
-                            </button>
-                        }
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                id="resendBtn"
+                                aria-label="Gửi lại mã OTP đến email"
+                                disabled>
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i> Gửi lại OTP
+                        </button>
                         <div id="resendMessage" class="mt-2" aria-live="polite"></div>
                     </div>
 
 
                     <!-- Cancel Checkout -->
                     <div class="text-center">
-                        @using (Html.BeginForm("CancelCheckout", "Order", FormMethod.Post, new { style = "display:inline;" }))
-                        {
-                            @Html.AntiForgeryToken()
-                            <button type="submit"
-                                    id="cancelBtn"
-                                    class="btn btn-outline-danger"
-                                    aria-label="Hủy quá trình đặt hàng và quay lại trang giỏ hàng"
-                                    onclick="return confirmCancelOrder();">
-                                <i class="fas fa-times" aria-hidden="true"></i> Hủy đặt hàng
-                            </button>
-                        }
+                        <button type="button"
+                                id="cancelBtn"
+                                class="btn btn-outline-danger"
+                                aria-label="Hủy quá trình đặt hàng và quay lại trang giỏ hàng">
+                            <i class="fas fa-times" aria-hidden="true"></i> Hủy đặt hàng
+                        </button>
 
                     </div>
 
@@ -365,10 +357,11 @@
         });
 
         // ✅ Resend OTP
-        $('#resendBtn').on('click', function() {
+        $('#resendBtn').on('click', function(e) {
+            e.preventDefault(); // Ngăn form submit mặc định
             const btn = $(this);
             const originalText = btn.html();
-
+        
             btn.html('<i class="fas fa-spinner fa-spin"></i> Đang gửi...').prop('disabled', true);
 
             $.ajax({
@@ -379,17 +372,20 @@
                 },
                 success: function(response) {
                     if (response.success) {
-                        $('#resendMessage').html('<div class="alert alert-success alert-sm"><i class="fas fa-check"></i> ' + response.message + '</div>');
+                        $('#resendMessage').html('<div class="alert alert-success mt-2">' + response.message + '</div>').fadeIn();
 
                         // Reset countdown
                         timeLeft = 5 * 60;
                         countdownElement.parent().removeClass('bg-danger countdown-expired').addClass('bg-warning text-dark');
+                        countdownElement.parent().html('<i class="fas fa-clock" aria-hidden="true"></i> Mã hết hạn sau: <span id="countdown">5:00</span>');
                         $('#verifyBtn').prop('disabled', false);
                         $('#otp').val('').focus();
+                        clearInterval(countdownInterval);
+                        countdownInterval = setInterval(updateCountdown, 1000);
 
                         announceToScreenReader('OTP mới đã được gửi thành công');
                     } else {
-                        $('#resendMessage').html('<div class="alert alert-danger alert-sm"><i class="fas fa-exclamation-triangle"></i> ' + response.message + '</div>');
+                        $('#resendMessage').html('<div class="alert alert-danger mt-2">' + response.message + '</div>').fadeIn();
                         announceToScreenReader('Có lỗi khi gửi lại OTP: ' + response.message);
                     }
                 },
@@ -402,7 +398,7 @@
 
                     // Auto hide message after 5 seconds
                     setTimeout(function() {
-                        $('#resendMessage').fadeOut();
+                        $('#resendMessage').fadeOut().html('');
                     }, 5000);
                 }
             });
@@ -410,7 +406,7 @@
 
         // ✅ Cancel Checkout
         $('#cancelBtn').on('click', function() {
-            if (confirm('Bạn có chắc chắn muốn hủy đặt hàng?')) {
+            if (confirm('Bạn có chắc chắn muốn hủy quá trình đặt hàng? Thao tác này sẽ đưa bạn trở lại giỏ hàng.')) {
                 const btn = $(this);
                 const originalText = btn.html();
 
@@ -427,7 +423,7 @@
                     success: function(response) {
                         if (response.success) {
                             clearInterval(countdownInterval);
-                            window.location.href = '@Url.Action("Checkout", "Order")';
+                            window.location.href = response.redirectUrl || '@Url.Action("UserCart", "Cart")';
                         } else {
                             alert('Có lỗi xảy ra: ' + response.message);
                         }
@@ -444,11 +440,12 @@
         });
 
         // ✅ Enable resend button after 1 minute
-        setTimeout(function() {
+        function enableResendButton() {
             if (timeLeft > 0) {
                 resendBtn.prop('disabled', false);
             }
-        }, 60000);
+        }
+        setTimeout(enableResendButton, 30000); // Cho phép gửi lại sau 30 giây
 
         // ✅ Prevent page refresh/close warning
         $(window).on('beforeunload', function() {

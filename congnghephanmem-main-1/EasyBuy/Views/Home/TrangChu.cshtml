@@ -340,7 +340,6 @@
             position: relative !important;
             display: flex !important;
             flex-direction: column !important;
-            height: 100% !important;
             color: #000000 !important; /* Ép màu chữ mặc định không bị lây màu xám/trắng */
 
             position: relative !important;
@@ -415,6 +414,8 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            /* Đảm bảo thẻ title luôn chiếm chiều cao của 2 dòng (1.05rem * 1.4 * 2) */
+            min-height: 2.94rem; 
         }
 
         .product-card-modern .product-price {
@@ -473,8 +474,8 @@
             border-radius: 50px !important; 
             padding: 8px 24px !important;
             font-size: 0.95rem !important;
-            font-weight: 600 !important;
-            margin-top: auto !important; /* Đẩy nút xuống sát đáy */
+            font-weight: 600 !important; 
+            margin-top: 1rem !important; /* Thay 'auto' bằng một khoảng cách cố định để đồng nhất */
             transition: all 0.2s ease;
             width: max-content !important;
             text-decoration: none !important;
@@ -766,10 +767,12 @@
                           !string.IsNullOrEmpty(Context.Request.Query["page"]);
     
     // Thêm tham số 'lightTitle' vào hàm
-    async Task RenderProductSection(string boldTitle, string lightTitle, IEnumerable<Product> products, string queryString)
+    async Task RenderProductSection(string boldTitle, string lightTitle, IEnumerable<Product> products, string queryString, int? limit = null)
     {
         if (products != null && products.Any())
         {
+            var productsToShow = limit.HasValue ? products.Take(limit.Value) : products;
+
             <section class="category-section mt-5 mb-5">
                 <div class="container">
                     
@@ -784,44 +787,10 @@
                         </a>
                     </div>
                     <div class="row">
-                        @foreach (var item in products)
+                        @foreach (var item in productsToShow)
                         {
                             <div class="col-6 col-md-4 col-lg-3 mb-4">
                                 @await Html.PartialAsync("_ProductCard", item)
-                                @* --- ĐÃ MỞ MÃ NGUỒN CỦA THẺ SẢN PHẨM TẠI ĐÂY --- *@
-                                <div class="product-card-modern fade-in h-100" data-product-id="@item.ProductId">
-
-                                    @* Huy hiệu giảm giá hình tròn *@
-                                    @if (item.Discount > 0)
-                                    {
-                                        <div class="discount-badge-circle">
-                                            <span>Giảm</span>
-                                            <span>@item.Discount%</span>
-                                        </div>
-                                    }
-
-                                    @* Nút yêu thích *@
-                                    <button type="button" class="wishlist-btn" onclick="toggleWishlist(this, @item.ProductId)" title="Thêm vào yêu thích">
-                                        <i class="far fa-heart"></i>
-                                    </button>
-
-                                    <a href="/product/@item.ProductId" class="text-decoration-none">
-                                        <div class="product-image-container">
-                                            <img src="@(string.IsNullOrEmpty(item.ImagePr) ? "/images/default-product.png" : item.ImagePr.Split(';')[0])" alt="@item.ProductName" loading="lazy" />
-                                        </div>
-                                    </a>
-
-                                    <div class="product-info">
-                                        <a href="/product/@item.ProductId" class="text-decoration-none w-100">
-                                            <h3 class="product-title">@item.ProductName</h3>
-                                        </a>
-
-                                        <div class="price-current">@string.Format("{0:N0}", item.SellingPrice * (1 - (item.Discount ?? 0) / 100)) VND</div>
-                                        <div class="price-old" style="@(item.Discount > 0 ? "" : "visibility: hidden;")">@string.Format("{0:N0}", item.SellingPrice) VND</div>
-
-                                        <a href="/product/@item.ProductId" class="btn btn-detail">Xem chi tiết</a>
-                                    </div>
-                                </div>
                             </div>
                         }
                     </div>
@@ -837,36 +806,12 @@
         <h2 class="section-title">Kết quả tìm kiếm</h2>
         @if (Model != null && Model.Any())
         {
-            <div class="product-grid">
+            <div class="row">
                 @foreach (var item in Model)
                 {
-                    <div class="product-card-modern fade-in" data-product-id="@item.ProductId">
-                        @if (item.Discount > 0)
-                        {
-                            <div class="badge discount-badge">-@item.Discount%</div>
-                        }
-                        <button type="button" class="wishlist-btn" onclick="toggleWishlist(this, @item.ProductId)" title="Thêm vào yêu thích">
-                            <i class="far fa-heart"></i>
-                        </button>
-                        <a href="/product/@item.ProductId" class="product-link">
-                            <div class="product-image-container">
-                                <img src="@(string.IsNullOrEmpty(item.ImagePr) ? "" : item.ImagePr.Split(';')[0])" alt="@item.ProductName" loading="lazy" />
-                            </div>
-                            <div class="product-info">
-                                <h3 class="product-title">@item.ProductName</h3>
-                                <div class="product-price">
-                                    @if (item.Discount > 0)
-                                    {
-                                        <span class="text-primary fw-bold">@string.Format("{0:N0}", item.SellingPrice - (item.SellingPrice * item.Discount / 100)) ₫</span>
-                                        <span class="text-muted text-decoration-line-through small ms-2">@string.Format("{0:N0}", item.SellingPrice) ₫</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-primary fw-bold">@string.Format("{0:N0}", item.SellingPrice) ₫</span>
-                                    }
-                                </div>
-                            </div>
-                        </a>
+                    <div class="col-6 col-md-4 col-lg-3 mb-4">
+                        @* Sử dụng lại Partial View để đảm bảo giao diện nhất quán *@
+                        @await Html.PartialAsync("_ProductCard", item)
                     </div>
                 }
             </div>
@@ -924,12 +869,12 @@
 }
 else
 {
-    await RenderProductSection("Sản phẩm nổi bật.", "Tinh hoa hội tụ.", ViewBag.FeaturedProducts as IEnumerable<Product>, "isfeatured=true");
-    await RenderProductSection("Đang gây bão.", "Sự lựa chọn của số đông.", ViewBag.TopSellingProducts as IEnumerable<Product>, "topselling=true");
-    await RenderProductSection("Smartphone đỉnh cao.", "Cả thế giới thu bé vừa bằng lòng bàn tay.", ViewBag.Phones as IEnumerable<Product>, "categoryName=Dien thoai");
-    await RenderProductSection("Laptop.", "Hiệu năng bứt phá. Sẵn sàng cho mọi ý tưởng.", ViewBag.Laptops as IEnumerable<Product>, "categoryName=Laptop");
-    await RenderProductSection("Máy tính bảng.", "Mỏng nhẹ tuyệt đối. Sáng tạo vô hạn.", ViewBag.Tablets as IEnumerable<Product>, "categoryName=May tinh bang");
-    await RenderProductSection("Phụ kiện.", "Mảnh ghép hoàn hảo. Nâng tầm trải nghiệm.", ViewBag.Accessories as IEnumerable<Product>, "categoryName=Phu kien");
+    await RenderProductSection("Sản phẩm nổi bật.", "Tinh hoa hội tụ.", ViewBag.FeaturedProducts as IEnumerable<Product>, "isfeatured=true", 4);
+    await RenderProductSection("Đang gây bão.", "Sự lựa chọn của số đông.", ViewBag.TopSellingProducts as IEnumerable<Product>, "topselling=true", 4);
+    await RenderProductSection("Smartphone đỉnh cao.", "Cả thế giới thu bé vừa bằng lòng bàn tay.", ViewBag.Phones as IEnumerable<Product>, "categoryName=Dien thoai", 4);
+    await RenderProductSection("Laptop.", "Hiệu năng bứt phá. Sẵn sàng cho mọi ý tưởng.", ViewBag.Laptops as IEnumerable<Product>, "categoryName=Laptop", 4);
+    await RenderProductSection("Máy tính bảng.", "Mỏng nhẹ tuyệt đối. Sáng tạo vô hạn.", ViewBag.Tablets as IEnumerable<Product>, "categoryName=May tinh bang", 4);
+    await RenderProductSection("Phụ kiện.", "Mảnh ghép hoàn hảo. Nâng tầm trải nghiệm.", ViewBag.Accessories as IEnumerable<Product>, "categoryName=Phu kien", 4);
 }
 
 <!-- Newsletter Section -->

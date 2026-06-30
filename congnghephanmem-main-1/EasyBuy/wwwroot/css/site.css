@@ -30,61 +30,6 @@
         background-size: 50%;
     }
 
-/* FontAwesome icon styles */
-.fas, .far, .fab, .fal, .fad, .fass, .fasr, .fasl {
-  font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Pro', 'Font Awesome 5 Free', 'FontAwesome' !important;
-  font-style: normal;
-  font-variant: normal;
-  text-rendering: auto;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-i[class*="fa-"] {
-  display: inline-block;
-  font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Pro', 'Font Awesome 5 Free', 'FontAwesome' !important;
-}
-
-/* Specific FontAwesome class protection */
-.fa, .fas, .far, .fal, .fad, .fab, .fass, .fasr, .fasl, 
-[class^="fa-"], [class*=" fa-"] {
-  font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Pro', 'Font Awesome 5 Free', 'FontAwesome' !important;
-  font-style: normal !important;
-  font-variant: normal !important;
-  text-rendering: auto !important;
-  line-height: 1 !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-}
-
-/* Additional FontAwesome protection for nested elements */
-button i[class*="fa-"], 
-a i[class*="fa-"], 
-span i[class*="fa-"], 
-div i[class*="fa-"] {
-  font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Pro', 'Font Awesome 5 Free', 'FontAwesome' !important;
-  font-style: normal !important;
-  font-weight: 900 !important;
-  text-rendering: auto !important;
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-}
-
-/* FontAwesome display properties */
-.fa, .fas, .far, .fal, .fad, .fab, .fass, .fasr, .fasl, 
-[class^="fa-"], [class*=" fa-"], i[class*="fa-"] {
-  speak: none;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-  display: inline-block;
-  text-decoration: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
 /* Ensure FontAwesome icons maintain their font-weight */
 .fas, .fa-solid {
   font-weight: 900 !important;
@@ -100,16 +45,6 @@ div i[class*="fa-"] {
 
 .fab, .fa-brands {
   font-weight: 400 !important;
-}
-
-/* FontAwesome override for problematic containers */
-.navbar i[class*="fa-"],
-.dropdown i[class*="fa-"],
-.btn i[class*="fa-"],
-.nav-item i[class*="fa-"],
-.dropdown-item i[class*="fa-"] {
-  font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Pro', 'Font Awesome 5 Free', 'FontAwesome' !important;
-  font-weight: 900 !important;
 }
 
 /* Header Navigation Styles */

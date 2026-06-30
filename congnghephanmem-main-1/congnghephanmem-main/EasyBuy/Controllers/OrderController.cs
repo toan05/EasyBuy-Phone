@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using Microsoft.AspNetCore.Mvc;
 using EasyBuy.Models;
 using Microsoft.EntityFrameworkCore;
 using EasyBuy.Services.EMAILOTP;
@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using EasyBuy.Method;
 using System.Globalization;
 using System.Security.Cryptography;
+using System.Security.Claims;
 
 namespace EasyBuy.Controllers
 {
@@ -39,12 +40,17 @@ namespace EasyBuy.Controllers
             var response = _vpnPayService.PaymentExecute(Request.Query);
             if (response.Success)
             {
-                var userId = HttpContext.Session.GetInt32("UserID");
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                {
+                    TempData["Error"] = "Phiên đăng nhập không hợp lệ.";
+                    return RedirectToAction("Login", "Account");
+                }
                 var addressId = HttpContext.Session.GetInt32("TempAddressId");
                 var paymentMethodId = HttpContext.Session.GetInt32("TempPaymentMethodId");
                 var voucherCode = HttpContext.Session.GetString("TempVoucherCode");
 
-                if (userId == null || addressId == null || paymentMethodId == null)
+                if (addressId == null || paymentMethodId == null)
                 {
                     TempData["Error"] = "Thiếu thông tin thanh toán.";
                     return RedirectToAction("Checkout");
@@ -89,7 +95,7 @@ namespace EasyBuy.Controllers
 
                 var order = new Order
                 {
-                    UserId = userId.Value,
+                    UserId = userId,
                     AddressId = addressId.Value,
                     PaymentMethodId = paymentMethodId.Value,
                     VoucherId = voucherId,
@@ -204,14 +210,19 @@ namespace EasyBuy.Controllers
         {
             try
             {
-                var userId = HttpContext.Session.GetInt32("UserID");
-                if (userId == null)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                     return RedirectToAction("Login", "Account");
-
                 var cart = await _context.Carts
                     .Include(c => c.CartItems)
                     .ThenInclude(ci => ci.Product)
                     .FirstOrDefaultAsync(c => c.UserId == userId && c.IsCheckedOut == false);
+
+                if (cart == null || !cart.CartItems.Any())
+                {
+                    TempData["Error"] = "Giỏ hàng của bạn đang trống.";
+                    return RedirectToAction("UserCart", "Cart");
+                }
 
                 var addresses = _context.Addresses
                     .Include(a => a.User)
@@ -233,10 +244,9 @@ namespace EasyBuy.Controllers
         {
             try
             {
-                var userId = HttpContext.Session.GetInt32("UserID");
-                if (userId == null)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                     return RedirectToAction("Login", "Account");
-
                 var cart = await _context.Carts
                     .Include(c => c.CartItems)
                     .ThenInclude(ci => ci.Product)
@@ -388,8 +398,9 @@ namespace EasyBuy.Controllers
             var totalAmountString = HttpContext.Session.GetString("CheckoutTotalAmount");
             var finalAmountString = HttpContext.Session.GetString("CheckoutFinnalAmout");
             var Discount = HttpContext.Session.GetString("CheckoutDiscount");
-            var userId = HttpContext.Session.GetInt32("UserID");
-
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+                return RedirectToAction("Login", "Account");
             if (!decimal.TryParse(Discount, NumberStyles.Any, CultureInfo.InvariantCulture, out var discount))
             {
                 ViewBag.Error = "Không tìm thấy mã giảm giá";
@@ -420,7 +431,7 @@ namespace EasyBuy.Controllers
                 return View();
             }
 
-            if (cartId == null || addressId == null || paymentMethodId == null || userId == null || !decimal.TryParse(totalAmountString, NumberStyles.Any, CultureInfo.InvariantCulture, out var finalAmount))
+            if (cartId == null || addressId == null || paymentMethodId == null || !decimal.TryParse(finalAmountString, NumberStyles.Any, CultureInfo.InvariantCulture, out var finalAmount))
             {
                 ViewBag.Error = "Thông tin không đầy đủ.";
                 return View();
@@ -455,7 +466,7 @@ namespace EasyBuy.Controllers
                     .ToDictionary(p => p.ProductId, p => p.Quantity.Value);
                 var order = new Order
                 {
-                    UserId = userId.Value,
+                    UserId = userId,
                     AddressId = addressId.Value,
                     PaymentMethodId = paymentMethodId.Value,
                     VoucherId = voucherId == 0 ? null : voucherId,
@@ -531,10 +542,9 @@ namespace EasyBuy.Controllers
         {
             try
             {
-                var userId = HttpContext.Session.GetInt32("UserID");
-                if (userId == null)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
-                    ViewBag.Error = "Phiên đăng nhập đã hết hạn.";
                     return View("VerifyOtp");
                 }
 
@@ -640,7 +650,7 @@ namespace EasyBuy.Controllers
 
             decimal discount = 0;
             if (voucher.DiscountType == "percent")
-                discount = parsedTotal * (voucher.DiscountValue ?? 0) / 100;
+                discount = parsedTotal * (voucher.DiscountValue ?? 0) / 100; 
             else if (voucher.DiscountType == "amount")
                 discount = voucher.DiscountValue ?? 0;
 
@@ -742,8 +752,8 @@ namespace EasyBuy.Controllers
         {
             try
             {
-                var userId = HttpContext.Session.GetInt32("UserID");
-                if (userId == null)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                     return Json(new { success = false, message = "Chưa đăng nhập" });
 
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
@@ -769,10 +779,10 @@ namespace EasyBuy.Controllers
         {
             try
             {
-                var userId = HttpContext.Session.GetInt32("UserID");
-                if (userId == null)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                     return RedirectToAction("Login", "Account");
-
+                
                 var orders = await _context.Orders
                     .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
@@ -823,8 +833,8 @@ namespace EasyBuy.Controllers
         {
             try
             {
-                var userId = HttpContext.Session.GetInt32("UserID");
-                if (userId == null)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                     return RedirectToAction("Login", "Account");
 
                 var order = await _context.Orders
@@ -862,15 +872,12 @@ namespace EasyBuy.Controllers
         {
             try
             {
-                // Bước 1: Truy vấn Session để kiểm tra đăng nhập
-                var userId = HttpContext.Session.GetInt32("UserID");
-                if (userId == null)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
                     TempData["Error"] = "Bạn cần đăng nhập để thực hiện chức năng này."; // MS01
                     return RedirectToAction("Login", "Account"); // AD login
                 }
-
-                using var transaction = await _context.Database.BeginTransactionAsync();
 
                 try
                 {
@@ -902,7 +909,7 @@ namespace EasyBuy.Controllers
                         // Nếu không có thì tạo giỏ hàng mới
                         cart = new Cart
                         {
-                            UserId = userId.Value,
+                            UserId = userId,
                             CreatedAt = DateTime.Now,
                             IsCheckedOut = false,
                             CartItems = new List<CartItem>()
@@ -948,13 +955,11 @@ namespace EasyBuy.Controllers
 
                     // Bước 6: Lưu thay đổi
                     await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
 
                     return RedirectToAction("UserCart", "Cart");
                 }
                 catch (Exception ex)
                 {
-                    await transaction.RollbackAsync();
                     Console.WriteLine($"Lỗi RepeatOrder inner: {ex.Message}");
                     throw;
                 }

@@ -1,6 +1,6 @@
 @model EasyBuy.Models.Product
 
-<div class="product-card-modern fade-in h-100" data-product-id="@Model.ProductId">
+<div class="product-card-modern fade-in" data-product-id="@Model.ProductId">
 
     @* Huy hiệu giảm giá hình tròn *@
     @if (Model.Discount > 0)
@@ -27,17 +27,20 @@
             <h3 class="product-title">@Model.ProductName</h3>
         </a>
 
-        @if (Model.Discount > 0)
-        {
-            <div class="price-current">@string.Format("{0:N0}", Model.SellingPrice * (1 - Model.Discount / 100)) VND</div>
-            <div class="price-old">@string.Format("{0:N0}", Model.SellingPrice) VND</div>
-        }
-        else
-        {
-            <div class="price-current">@string.Format("{0:N0}", Model.SellingPrice) VND</div>
-            <div class="price-old" style="visibility: hidden;">0 VND</div>
-        }
+        @* Bọc giá và nút vào một div và thêm mt-auto để đẩy xuống đáy *@
+        <div class="mt-auto w-100">
+            @if (Model.Discount > 0)
+            {
+                <div class="price-current">@string.Format("{0:N0}", Model.SellingPrice * (1 - Model.Discount / 100)) VND</div>
+                <div class="price-old">@string.Format("{0:N0}", Model.SellingPrice) VND</div>
+            }
+            else
+            {
+                <div class="price-current">@string.Format("{0:N0}", Model.SellingPrice) VND</div>
+                <div class="price-old" style="visibility: hidden;">0 VND</div>
+            }
 
-        <a href="/product/@Model.ProductId" class="btn btn-detail">Xem chi tiết</a>
+            <a href="/product/@Model.ProductId" class="btn btn-detail">Xem chi tiết</a>
+        </div>
     </div>
 </div>

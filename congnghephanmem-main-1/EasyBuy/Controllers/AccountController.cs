@@ -1,11 +1,9 @@
-﻿﻿﻿﻿﻿﻿using EasyBuy.Models;
+﻿﻿﻿using EasyBuy.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
-using Microsoft.Extensions.Logging;
 
 
 namespace EasyBuy.Controllers
@@ -13,18 +11,17 @@ namespace EasyBuy.Controllers
     public class AccountController : Controller
     {
         private readonly EasyBuyContext _context;
-        private readonly ILogger<AccountController> _logger;
         private EasyBuy.Method.Method method = new EasyBuy.Method.Method();
         
-        public AccountController(EasyBuyContext context, ILogger<AccountController> logger)
+        public AccountController(EasyBuyContext context)
         {
             _context = context;
-            _logger = logger;
         }
         [HttpGet]
         public IActionResult Login()
         {
-            if (User.Identity.IsAuthenticated && User.Identity.AuthenticationType == CookieAuthenticationDefaults.AuthenticationScheme)
+            // Sử dụng User.Identity.IsAuthenticated để kiểm tra đăng nhập từ cookie
+            if (User.Identity != null && User.Identity.IsAuthenticated && User.Identity.AuthenticationType == CookieAuthenticationDefaults.AuthenticationScheme)
             {
                 return RedirectToAction("TrangChu", "Home");
             }
@@ -32,7 +29,7 @@ namespace EasyBuy.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string name, string password)
+        public async Task<IActionResult> Login(string name, string password, bool rememberMe = false)
         {
             try
             {
@@ -92,27 +89,31 @@ namespace EasyBuy.Controllers
                     if (user.Role != "Customer")
                     {
                         ViewBag.Error = "Vui lòng sử dụng trang đăng nhập dành cho quản trị viên.";
-                        return View();
+                        return View("Login");
                     }
 
+                    // Tạo các claims để lưu vào cookie
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, user.Email ?? user.Phone),
                         new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                         new Claim(ClaimTypes.Role, user.Role)
                     };
-
+ 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                     var authProperties = new AuthenticationProperties
                     {
-                        IsPersistent = true // Remember me
+                        IsPersistent = rememberMe // Giá trị này sẽ là true nếu người dùng tick vào checkbox
                     };
-
+ 
+                    // Đăng nhập bằng cookie
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
-
+ 
+                    // Reset số lần đăng nhập sai
                     user.FailedLoginCount = 0;
                     _context.SaveChanges();
-
+ 
+                    // Ghi log
                     var log = new LogActivity
                     {
                         UserId = user.UserId,
@@ -121,7 +122,7 @@ namespace EasyBuy.Controllers
                     };
                     _context.Add(log);
                     _context.SaveChanges();
-
+ 
                     return RedirectToAction("TrangChu", "Home");
                 }
                 else
@@ -156,8 +157,9 @@ namespace EasyBuy.Controllers
         {
             try
             {
+                // Chỉ đăng xuất khỏi scheme của customer
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // Chỉ đăng xuất scheme của customer
-
+ 
                 return RedirectToAction("Login", "Account");
             }
             catch (Exception ex)
@@ -171,8 +173,8 @@ namespace EasyBuy.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            // Nếu đã đăng nhập thì về trang chủ
-            if (User.Identity.IsAuthenticated)
+            // Kiểm tra đăng nhập bằng cookie
+            if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("TrangChu", "Home");
             }
@@ -180,66 +182,51 @@ namespace EasyBuy.Controllers
         }
         [HttpPost]
 
-        
-        //Logger
         public IActionResult Register(string phone, string password, string repassword, string name, string email)
         {
             try
             {
-                _logger.LogInformation("Bắt đầu đăng ký tài khoản: email={Email}, phone={Phone}", email, phone);
-
                 if (method.IsEmpty(phone) || method.IsEmpty(password) || method.IsEmpty(repassword) || method.IsEmpty(name) || method.IsEmpty(email))
                 {
-                    _logger.LogWarning("Validation fail: các trường trống");
                     ViewBag.MS = "Các trường không được để trống";
                     return View();
                 }
                 if (!method.IsValidPassword(password))
                 {
-                    _logger.LogWarning("Validation fail: password không hợp lệ");
                     ViewBag.MS = "Mật khẩu phải lớn hơn 8 ký tự và có chữ hoa chữ thường";
                     return View();
                 }
                 if (!method.IsValidVietnamPhoneNumber(phone))
                 {
-                    _logger.LogWarning("Validation fail: phone không hợp lệ - {Phone}", phone);
                     ViewBag.MS = "Số điện thoại không hợp lệ";
                     return View();
                 }
                 if (password != repassword)
                 {
-                    _logger.LogWarning("Validation fail: password không khớp");
                     ViewBag.MS = "Mật khẩu nhập lại không đúng";
                     return View();
                 }
                 if (!method.IsValidName(name))
                 {
-                    _logger.LogWarning("Validation fail: name không hợp lệ - {Name}", name);
                     ViewBag.MS = "Tên không được chứa số hay ký tự đặc biệt";
                     return View();
                 }
                 if (!method.IsValidEmail(email))
                 {
-                    _logger.LogWarning("Validation fail: email không hợp lệ - {Email}", email);
                     ViewBag.MS = "Email không hợp lệ";
                     return View();
                 }
                 if (_context.Users.Any(u => u.Phone == phone))
                 {
-                    _logger.LogWarning("Validation fail: phone đã tồn tại - {Phone}", phone);
                     ViewBag.MS = "Số điện thoại đã có người sử dụng";
                     return View();
                 }
 
                 if (_context.Users.Any(u => u.Email == email))
                 {
-                    _logger.LogWarning("Validation fail: email đã tồn tại - {Email}", email);
                     ViewBag.MS = "Email đã có người sử dụng";
                     return View();
                 }
-
-                _logger.LogInformation("Validation thành công, tạo user mới");
-
                 var user = new User
                 {
                     Phone = phone,
@@ -253,15 +240,11 @@ namespace EasyBuy.Controllers
                 };
                 _context.Add(user);
                 _context.SaveChanges();
-
-                _logger.LogInformation("Đăng ký thành công cho user {Email}", email);
-
                 return RedirectToAction("Login");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi đăng ký tài khoản: email={Email}, phone={Phone}", email, phone);
-                ViewBag.MS = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
+                ViewBag.MS = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau." + ex;
                 return View();
             }
         }
@@ -269,28 +252,38 @@ namespace EasyBuy.Controllers
         [HttpGet]
         public IActionResult UpdateAccount()
         {
-            if (!User.Identity.IsAuthenticated)
+            // Kiểm tra đăng nhập bằng cookie
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Login", "Account");
             }
-            // Lấy thông tin user và truyền vào View
-            return View();
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = _context.Users.Find(userId);
+
+            // Truyền model user vào View
+            return View(user);
         }
 
         [HttpPost]
         public IActionResult UpdateAccount(string name, string email, string phone, string password)
         {
+            var userToUpdateView = new User { FullName = name, Email = email, Phone = phone };
             try
-            {
+            {   
+                // Lấy userId từ Claims thay vì Session
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
                     return Unauthorized();
                 }
-
-                int userId = int.Parse(userIdClaim.Value);
+ 
                 var user = _context.Users.Find(userId);
-
+ 
                 if (method.IsEmpty(password))
                 {
                     ViewBag.Error = "Bạn phải nhập mật khẩu để xác nhận thay đổi.";
@@ -302,7 +295,7 @@ namespace EasyBuy.Controllers
                     ViewBag.Error = "Mật khẩu không đúng.";
                     return View(user);
                 }
-
+ 
                 // Chỉ cập nhật trường nào được nhập
                 if (!method.IsEmpty(name))
                 {
@@ -336,9 +329,9 @@ namespace EasyBuy.Controllers
                     }
                     user.Phone = phone;
                 }
-
+ 
                 _context.SaveChanges();
-
+ 
                 ViewBag.Success = "Cập nhật tài khoản thành công!";
                 return View(user);
             }
@@ -346,7 +339,7 @@ namespace EasyBuy.Controllers
             {
                 Console.WriteLine(ex);
                 ViewBag.Error = "Có lỗi hệ thống";
-                return View();
+                return View(userToUpdateView);
             }
         }
 
@@ -354,31 +347,39 @@ namespace EasyBuy.Controllers
         [HttpGet]
         public IActionResult ChangePassword()
         {
-            if (!User.Identity.IsAuthenticated)
+            // Kiểm tra đăng nhập bằng cookie
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Login", "Account");
             }
-            return View();
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = _context.Users.Find(userId);
+
+            return View(user);
         }
 
         [HttpPost]
         public IActionResult ChangePassword(string newpassword, string renewpassword, string password)
         {
+            var user = _context.Users.Find(int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)));
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
                     return Unauthorized();
                 }
-                int userId = int.Parse(userIdClaim.Value);
-                var user = _context.Users.Find(userId);
-
+ 
                 if (user == null)
                 {
                     return RedirectToAction("Login", "Account");
                 }
-
+ 
                 if (method.IsEmpty(newpassword) || method.IsEmpty(renewpassword) || method.IsEmpty(password))
                 {
                     ViewBag.Error = "Các trường không được để trống";
@@ -408,33 +409,33 @@ namespace EasyBuy.Controllers
             catch (Exception ex)
             {
                 ViewBag.Error = "Lỗi hệ thống: " + ex.Message;
-                return View();
+                return View(user); // Trả về user đã tìm thấy ở đầu hàm
             }
         }
 
         [HttpGet]
         public IActionResult ListAdress()
         {
+            // Lấy userId từ Claims thay vì Session
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
                 return RedirectToAction("Login", "Account");
             }
-            int userId = int.Parse(userIdClaim.Value);
-
+ 
             var addresses = _context.Addresses
                 .Where(a => a.UserId == userId)
                 .OrderByDescending(a => a.CreatedAt)
                 .ToList();
-
+ 
             return View(addresses);
         }
         [HttpGet]
         public IActionResult AddAdress()
         {
             // Kiểm tra đăng nhập bằng cookie thay vì session
-            if (!User.Identity.IsAuthenticated)
-            {
+            if (User.Identity == null || !User.Identity.IsAuthenticated)
+            {   
                 return RedirectToAction("Login");
             }
             return View();
@@ -445,18 +446,19 @@ namespace EasyBuy.Controllers
         {
             try
             {
+                // Lấy userId từ Claims thay vì Session
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
                     return RedirectToAction("Login", "Account");
                 }
-
+ 
                 var user = _context.Users.Find(userId);
                 if (user == null)
                 {
                     return RedirectToAction("Login", "Account");
                 }
-
+ 
                 // Tạo model để giữ lại dữ liệu khi có lỗi
                 var model = new Address
                 {
@@ -467,20 +469,20 @@ namespace EasyBuy.Controllers
                     Phone = phone,
                     RecipientName = recipientName
                 };
-
+ 
                 if (method.IsEmpty(city) || method.IsEmpty(district) || method.IsEmpty(ward) || method.IsEmpty(street) || method.IsEmpty(phone) || method.IsEmpty(recipientName))
                 {
                     ViewBag.MS = "Các trường không được bỏ trống";
                     return View(model);
                 }
-
+ 
                 if (!method.IsValidVietnamPhoneNumber(phone))
                 {
                     ViewBag.MS = "Số điện thoại không hợp lệ";
                     return View(model);
                 }
-
-                var adress = new Address
+ 
+                var address = new Address
                 {
                     City = city,
                     District = district,
@@ -488,10 +490,10 @@ namespace EasyBuy.Controllers
                     Street = street,
                     Phone = phone,
                     RecipientName = recipientName,
-                    CreatedAt = DateTime.Now,
+                    CreatedAt = DateTime.Now, 
                     UserId = userId
                 };
-                _context.Add(adress);
+                _context.Add(address);
                 _context.SaveChanges();
                 TempData["Success"] = "Thêm địa chỉ thành công!";
                 return RedirectToAction("ListAdress");
@@ -516,20 +518,20 @@ namespace EasyBuy.Controllers
         {
             try
             {
+                // Lấy userId từ Claims thay vì Session
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
                     return RedirectToAction("Login", "Account");
                 }
-                int userId = int.Parse(userIdClaim.Value);
-
+ 
                 var address = _context.Addresses.FirstOrDefault(a => a.AddressId == id && a.UserId == userId);
                 if (address == null)
                 {
                     TempData["MS"] = "Không tìm thấy địa chỉ hoặc bạn không có quyền xóa.";
                     return RedirectToAction("ListAdress");
                 }
-
+ 
                 _context.Addresses.Remove(address);
                 _context.SaveChanges();
                 TempData["Success"] = "Xóa địa chỉ thành công!";
@@ -544,20 +546,20 @@ namespace EasyBuy.Controllers
         [HttpGet]
         public IActionResult UpdateAddress(int id)
         {
+            // Lấy userId từ Claims thay vì Session
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
                 return RedirectToAction("Login", "Account");
             }
-            int userId = int.Parse(userIdClaim.Value);
-
+ 
             var address = _context.Addresses.FirstOrDefault(a => a.AddressId == id && a.UserId == userId);
             if (address == null)
             {
                 TempData["MS"] = "Không tìm thấy địa chỉ hoặc bạn không có quyền sửa.";
                 return RedirectToAction("ListAdress");
             }
-
+ 
             return View(address);
         }
 
@@ -566,32 +568,32 @@ namespace EasyBuy.Controllers
         {
             try
             {
+                // Lấy userId từ Claims thay vì Session
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-                if (userIdClaim == null)
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
                 {
                     return RedirectToAction("Login", "Account");
                 }
-                int userId = int.Parse(userIdClaim.Value);
-
+ 
                 var address = _context.Addresses.FirstOrDefault(a => a.AddressId == id && a.UserId == userId);
                 if (address == null)
                 {
                     TempData["MS"] = "Không tìm thấy địa chỉ hoặc bạn không có quyền sửa.";
                     return RedirectToAction("ListAdress");
                 }
-
+ 
                 if (method.IsEmpty(city) || method.IsEmpty(district) || method.IsEmpty(ward) || method.IsEmpty(street) || method.IsEmpty(phone) || method.IsEmpty(recipientName))
                 {
                     ViewBag.MS = "Các trường không được bỏ trống";
                     return View(address);
                 }
-
+ 
                 if (!method.IsValidVietnamPhoneNumber(phone))
                 {
                     ViewBag.MS = "Số điện thoại không hợp lệ";
                     return View(address);
                 }
-
+ 
                 // Cập nhật thông tin
                 address.City = city;
                 address.District = district;
@@ -599,7 +601,7 @@ namespace EasyBuy.Controllers
                 address.Street = street;
                 address.Phone = phone;
                 address.RecipientName = recipientName;
-
+ 
                 _context.SaveChanges();
                 TempData["Success"] = "Cập nhật địa chỉ thành công!";
                 return RedirectToAction("ListAdress");
@@ -614,22 +616,23 @@ namespace EasyBuy.Controllers
         [HttpPost]
         public async Task<IActionResult> LockedAccount(bool confirm)
         {
+            // Lấy userId từ Claims thay vì Session
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
                 return RedirectToAction("Login", "Account");
             }
-            int userId = int.Parse(userIdClaim.Value);
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users.FindAsync(userId); // userId đã được parse an toàn
             if (user == null)
             {
                 TempData["MS"] = "Không tìm thấy tài khoản.";
                 return RedirectToAction("Login", "Account");
             }
-
+ 
             if (confirm)
             {
                 user.AccountStatus = "Locked";
+                // Đăng xuất khỏi cookie
                 await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "Khóa tài khoản thành công!";
@@ -640,7 +643,7 @@ namespace EasyBuy.Controllers
             }
             return RedirectToAction("Login", "Account");
         }
-
+ 
         public async Task<IActionResult> LoginByGoogle()
         {
             await HttpContext.ChallengeAsync(
@@ -651,7 +654,7 @@ namespace EasyBuy.Controllers
                 });
             return new EmptyResult();
         }
-
+ 
         public async Task<IActionResult> GoogleResponse()
         {
             try
@@ -662,17 +665,17 @@ namespace EasyBuy.Controllers
                     TempData["Error"] = "Đăng nhập Google thất bại. Vui lòng thử lại.";
                     return RedirectToAction("Login");
                 }
-
+ 
                 var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
                 var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 var fullName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-
+ 
                 if (string.IsNullOrEmpty(email))
                 {
                     TempData["Error"] = "Không thể lấy thông tin email từ Google. Vui lòng thử lại.";
                     return RedirectToAction("Login");
                 }
-
+ 
                 // Kiểm tra user đã tồn tại
                 var existingUser = _context.Users.FirstOrDefault(u => u.Email == email);
                 
@@ -700,7 +703,7 @@ namespace EasyBuy.Controllers
                         TempData["Error"] = "Tài khoản đã bị khóa.";
                         return RedirectToAction("Login");
                     }
-
+ 
                     // Đăng nhập thành công bằng CustomerScheme
                     var loginClaims = new List<Claim>
                     {
@@ -710,7 +713,7 @@ namespace EasyBuy.Controllers
                     };
                     var claimsIdentity = new ClaimsIdentity(loginClaims, CookieAuthenticationDefaults.AuthenticationScheme);
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), new AuthenticationProperties { IsPersistent = true });
-
+ 
                     existingUser.FailedLoginCount = 0;
                     
                     var log = new LogActivity
@@ -721,8 +724,8 @@ namespace EasyBuy.Controllers
                     };
                     _context.Add(log);
                     await _context.SaveChangesAsync();
-
-
+ 
+ 
                     return RedirectToAction("TrangChu", "Home");
                 }
                 else
@@ -740,7 +743,7 @@ namespace EasyBuy.Controllers
                 return RedirectToAction("Login");
             }
         }
-
+ 
         [HttpGet]
         public IActionResult SetPassword()
         {
@@ -759,7 +762,7 @@ namespace EasyBuy.Controllers
             TempData.Keep("GoogleName");
             return View();
         }
-
+ 
         [HttpPost]
         public async Task<IActionResult> SetPassword(string password, string confirmPassword)
         {
@@ -772,12 +775,12 @@ namespace EasyBuy.Controllers
                     TempData["Error"] = "Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.";
                     return RedirectToAction("Login");
                 }
-
+ 
                 ViewBag.Email = email;
                 ViewBag.UserName = name;
                 TempData.Keep("GoogleEmail");
                 TempData.Keep("GoogleName");
-
+ 
                 // Validation
                 if (method.IsEmpty(password) || method.IsEmpty(confirmPassword))
                 {
@@ -790,13 +793,13 @@ namespace EasyBuy.Controllers
                     ViewBag.Error = "Mật khẩu xác nhận không khớp.";
                     return View();
                 }
-
+ 
                 if (!method.IsValidPassword(password))
                 {
                     ViewBag.Error = "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa và chữ thường.";
                     return View();
                 }
-
+ 
                 // Kiểm tra email đã tồn tại chưa (tránh trường hợp user tạo account trong khi đang đặt password)
                 var existingUser = _context.Users.FirstOrDefault(u => u.Email == email);
                 if (existingUser != null)
@@ -804,7 +807,7 @@ namespace EasyBuy.Controllers
                     TempData["Error"] = "Email này đã được sử dụng. Vui lòng đăng nhập bình thường.";
                     return RedirectToAction("Login");
                 }
-
+ 
                 // Tạo user mới
                 var passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
                 var newUser = new User
@@ -818,10 +821,10 @@ namespace EasyBuy.Controllers
                     FailedLoginCount = 0,
                     CreatedAt = DateTime.Now,
                 };
-
+ 
                 _context.Add(newUser);
                 _context.SaveChanges();
-
+ 
                 // Đăng nhập tự động sau khi tạo tài khoản
                 var newClaims = new List<Claim>
                 {
@@ -831,7 +834,7 @@ namespace EasyBuy.Controllers
                 };
                 var newClaimsIdentity = new ClaimsIdentity(newClaims, CookieAuthenticationDefaults.AuthenticationScheme);
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(newClaimsIdentity), new AuthenticationProperties { IsPersistent = true });
-
+ 
                 
                 // Ghi log đăng ký
                 var logRegister = new LogActivity
@@ -842,7 +845,7 @@ namespace EasyBuy.Controllers
                 };
                 _context.Add(logRegister);
                 _context.SaveChanges();
-
+ 
                 TempData["Success"] = "Tạo tài khoản thành công! Chào mừng bạn đến với EasyBuy.";
                 return RedirectToAction("TrangChu", "Home");
             }
