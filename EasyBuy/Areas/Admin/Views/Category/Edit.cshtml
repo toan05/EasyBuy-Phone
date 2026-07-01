@@ -1,0 +1,21 @@
+@model EasyBuy.Models.Category
+@{
+    ViewData["Title"] = "Chỉnh sửa Danh mục";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" name="id" value="@Model.CateId" />
+    <div class="form-group">
+        <label>Tên danh mục</label>
+        <input class="form-control" name="categoryName" value="@Model.CategoryName" />
+    </div>
+    <button type="submit" class="btn btn-primary">Cập nhật</button>
+    <a class="btn btn-secondary" asp-action="Index">Quay lại</a>
+</form>

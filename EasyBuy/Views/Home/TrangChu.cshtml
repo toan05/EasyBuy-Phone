@@ -1,0 +1,894 @@
+﻿@using EasyBuy.Models
+@model IEnumerable<Product> 
+
+@{
+    ViewData["Title"] = "Trang chủ - Mua sắm dễ dàng";
+    Layout = "~/Views/Layout/_LayoutUser.cshtml";
+}
+
+@* Anti-forgery token for AJAX requests *@
+@Html.AntiForgeryToken()
+
+@section Scripts {
+    <script>
+        // Product interactions
+        function toggleWishlist(button, productId) {
+            // Add loading state
+            button.disabled = true;
+            const icon = button.querySelector('i');
+            const originalClasses = icon.className;
+            
+            // Show loading
+            icon.className = 'fas fa-spinner fa-spin';
+            
+            // Send AJAX request
+            fetch('/Wishlist/AddWishListAjax', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: `productId=${productId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update icon based on whether item was added or removed
+                    if (data.added) {
+                        icon.className = 'fas fa-heart';
+                        button.style.color = '#ff6b6b';
+                        button.title = 'Xóa khỏi yêu thích';
+                    } else {
+                        icon.className = 'far fa-heart';
+                        button.style.color = '#6c757d';
+                        button.title = 'Thêm vào yêu thích';
+                    }
+                    
+                    // Show success message
+                    showToast(data.message, 'success');
+                } else {
+                    // Restore original icon
+                    icon.className = originalClasses;
+                    
+                    // Show error message
+                    showToast(data.message, 'error');
+                    
+                    // If login required, redirect to login
+                    if (data.requireLogin) {
+                        setTimeout(() => {
+                            window.location.href = '/Account/Login';
+                        }, 2000);
+                    }
+                }
+            })
+            .catch(error => {
+                // Restore original icon
+                icon.className = originalClasses;
+                showToast('Có lỗi xảy ra. Vui lòng thử lại sau.', 'error');
+            })
+            .finally(() => {
+                button.disabled = false;
+                
+                // Add animation
+                button.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    button.style.transform = 'scale(1)';
+                }, 200);
+            });
+        }
+        
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast-notification toast-${type}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            // Add to page
+            document.body.appendChild(toast);
+            
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 100);
+            
+            // Remove toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+        
+        // Search functionality
+        function performSearch() {
+            const searchInput = document.querySelector('.search-input');
+            if (searchInput.value.trim()) {
+                document.querySelector('.filter-form').submit();
+            }
+        }
+        
+        // Filter animations and wishlist status check
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.product-card-modern');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('fade-in');
+            });
+            
+            // Kích hoạt thủ công Banner Carousel để đảm bảo nút bấm luôn hoạt động
+            const bannerCarousel = document.getElementById('homeBannerCarousel');
+            if (bannerCarousel && typeof bootstrap !== 'undefined') {
+                new bootstrap.Carousel(bannerCarousel, {
+                    interval: 4000,
+                    wrap: true
+                });
+            }
+
+            // Check wishlist status for all products
+            const wishlistButtons = document.querySelectorAll('.wishlist-btn');
+            wishlistButtons.forEach(button => {
+                const productId = button.getAttribute('onclick').match(/\d+/)[0];
+                checkWishlistStatus(button, productId);
+            });
+        });
+        
+        // Check if product is in wishlist
+        function checkWishlistStatus(button, productId) {
+            fetch(`/Wishlist/CheckWishlistStatus?productId=${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const icon = button.querySelector('i');
+                    if (data.inWishlist) {
+                        icon.className = 'fas fa-heart';
+                        button.style.color = '#ff6b6b';
+                        button.title = 'Xóa khỏi yêu thích';
+                    } else {
+                        icon.className = 'far fa-heart';
+                        button.style.color = '#6c757d';
+                        button.title = 'Thêm vào yêu thích';
+                    }
+                })
+                .catch(error => {
+                    // Default to not in wishlist if error
+                    const icon = button.querySelector('i');
+                    icon.className = 'far fa-heart';
+                    button.style.color = '#6c757d';
+                    button.title = 'Thêm vào yêu thích';
+                });
+        }
+
+        // Hiệu ứng trượt ngang cho danh mục sản phẩm (Carousel Scroll)
+        function scrollProductCarousel(button, direction) {
+            const container = button.closest('.carousel-container');
+            const track = container.querySelector('.product-carousel-track');
+            const scrollAmount = track.clientWidth; 
+            
+            if (direction === 'left') {
+                track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+    </script>
+    
+    <style>
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .fade-in {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        
+        keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stats-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 0;
+            margin: 3rem 0;
+            border-radius: var(--border-radius-lg);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Toast Notifications */
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 500;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            max-width: 400px;
+        }
+        
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+        
+        .toast-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .toast-error {
+            background: linear-gradient(135deg, #dc3545, #fd7e14);
+        }
+        
+        .toast-info {
+            background: linear-gradient(135deg, #17a2b8, #6f42c1);
+        }
+        
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .toast-content i {
+            font-size: 1.2rem;
+        }
+        
+        /* Wishlist button loading state */
+        .wishlist-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        /* --- Horizontal Carousel Styles --- */
+        .carousel-container {
+            position: relative;
+            padding: 0 45px; /* Để lại khoảng trống cho 2 nút mũi tên */
+        }
+        
+        .product-carousel-track {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            gap: 20px;
+            padding: 10px 5px 20px 5px; /* Thêm padding dưới để tránh bị cắt bóng shadow */
+            scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+            -ms-overflow-style: none; /* Ẩn thanh cuộn trên IE/Edge */
+        }
+        
+        .product-carousel-track::-webkit-scrollbar {
+            display: none; /* Ẩn thanh cuộn trên Chrome/Safari/Opera */
+        }
+        
+        .carousel-item-card {
+            flex: 0 0 calc(25% - 15px); /* Hiển thị 4 sản phẩm/hàng trên Desktop */
+            min-width: 240px; 
+        }
+        
+        /* Responsive cho Carousel */
+        @@media (max-width: 992px) {
+            .carousel-item-card { flex: 0 0 calc(33.333% - 14px); } /* 3 thẻ */
+        }
+        @@media (max-width: 768px) {
+            .carousel-item-card { flex: 0 0 calc(50% - 10px); } /* 2 thẻ */
+            .carousel-container { padding: 0 35px; }
+        }
+        @@media (max-width: 576px) {
+            .carousel-item-card { flex: 0 0 100%; } /* 1 thẻ */
+        }
+        
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            color: var(--dark-color, #333);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            border: 1px solid #eee;
+            transition: all 0.3s;
+        }
+        .carousel-control.prev { left: 0; }
+        .carousel-control.next { right: 0; }
+        .carousel-control:hover {
+            background: var(--primary-color, #0d6efd);
+            color: white;
+        }
+
+        .product-card-modern {
+            background: #ffffff !important;
+            background-color: #ffffff !important;
+            border: none !important;
+            border-radius: 28px !important; 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+            padding: 12px !important; 
+            transition: all 0.35s ease;
+            position: relative !important;
+            display: flex !important;
+            flex-direction: column !important;
+            color: #000000 !important; /* Ép màu chữ mặc định không bị lây màu xám/trắng */
+
+            position: relative !important;
+            overflow: visible !important;
+        }
+
+        .product-card-modern .product-image-container {
+            background: #ffffff !important;
+            background-color: #ffffff !important; /* Ép nền trắng tuyệt đối */
+            height: 220px !important;
+            width: 100% !important;
+            border: none !important; /* Xóa sạch mọi vạch kẻ đen */
+            outline: none !important;
+            border-radius: 20px !important; 
+            padding: 1.5rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            position: relative !important;
+            
+            /* Vẫn giữ hidden ở đây để ảnh khi hover phóng to không bị tràn ra ngoài viền bo tròn 20px của khung ảnh */
+            overflow: hidden !important;
+        }
+
+       .product-card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .product-card-modern .product-link {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        
+
+        .product-card-modern .product-image-container img {
+            background: #ffffff !important;
+            background-color: #ffffff !important; /* Phủ trắng những khoảng trống nếu ảnh bị lùn */
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+            transition: transform 0.4s ease;
+        }
+        .product-card-modern:hover .product-image-container img {
+            transform: scale(1.05);
+        }
+
+        .product-card-modern .product-info {
+            padding: 1rem 0.5rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            align-items: center; /* Căn giữa toàn bộ */
+            text-align: center;
+        }
+
+        .product-card-modern .product-title {
+            color: #000000 !important;
+            font-size: 1.05rem;
+            font-weight: 700;
+            line-height: 1.4;
+            margin-bottom: 0.8rem;
+            /* Giới hạn 2 dòng và thêm dấu ... */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            /* Đảm bảo thẻ title luôn chiếm chiều cao của 2 dòng (1.05rem * 1.4 * 2) */
+            min-height: 2.94rem; 
+        }
+
+        .product-card-modern .product-price {
+            margin-top: auto;
+            padding-top: 0.75rem;
+            text-align: center !important; /* Căn giữa text */
+            width: 100%;
+
+        }
+        /* 4. Giá tiền: Màu xanh dương nổi bật */
+        .product-card-modern .price-current {
+            color: #0084ff !important; /* Xanh dương sáng */
+            font-size: 1.4rem !important;
+            font-weight: 800 !important;
+        }
+
+        .product-card-modern .price-old {
+            color: #9e9e9e;
+            text-decoration: line-through;
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        .product-card-modern .product-price span.text-primary {
+            color: #0279f9 !important; /* Màu xanh lá chuẩn */
+            font-weight: 800 !important; /* Làm chữ cực dày (Extra Bold) */
+            font-size: 1.15rem !important; /* Phóng to chữ thêm một chút để nổi bật */
+            display: inline-block;
+        }
+
+        .product-card-modern .product-price span.text-muted {
+            font-weight: 500 !important;
+            display: inline-block;
+        }
+
+        .product-card-modern .wishlist-btn {
+            position: absolute !important;
+            top: 15px !important;
+            left: 15px !important;
+            background: #ffffff !important;
+            border: 1px solid #eaeaea !important;
+            border-radius: 50% !important;
+            width: 35px !important;
+            height: 35px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 5 !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+        }
+
+        /* 5. Nút Xem chi tiết */
+        .product-card-modern .btn-detail {
+            background-color: #0084ff !important;
+            color: #ffffff !important;
+            border: none !important;
+            border-radius: 50px !important; 
+            padding: 8px 24px !important;
+            font-size: 0.95rem !important;
+            font-weight: 600 !important; 
+            margin-top: 1rem !important; /* Thay 'auto' bằng một khoảng cách cố định để đồng nhất */
+            transition: all 0.2s ease;
+            width: max-content !important;
+            text-decoration: none !important;
+        }
+        .product-card-modern .btn-detail:hover {
+            background-color: #006bce;
+            color: white;
+        }
+        .product-card-modern .wishlist-btn:hover {
+            background: white;
+            transform: scale(1.1);
+        }
+
+        .product-card-modern .discount-badge-circle {
+            position: absolute !important;
+            top: -10px !important; /* Đẩy hẳn lên trên góc */
+            right: -10px !important; /* Đẩy hẳn ra lề phải */
+            background-color: #ff4757 !important;
+            color: #ffffff !important;
+            width: 50px !important;
+            height: 50px !important;
+            border-radius: 50% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            font-weight: 700 !important;
+            font-size: 0.85rem !important;
+            line-height: 1.2 !important;
+            box-shadow: 0 4px 10px rgba(255, 71, 87, 0.3) !important;
+            z-index: 10 !important;
+        }
+
+        /* Custom Banner & Promo Styles */
+        .banner-container {
+            margin-bottom: 2rem;
+        }
+        .carousel-item img {
+            height: 400px;
+            object-fit: cover;
+            border-radius: var(--border-radius-lg);
+        }
+        .promo-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .promo-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg) !important;
+            border-color: var(--primary-color);
+        }
+        .promo-icon-wrap {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+            
+            /* --- Category Pill Section --- */
+            .category-pill-container {
+                background: white;
+                border-radius: 50px;
+                padding: 1.5rem 1rem; /* Tăng padding trên dưới, giảm trái phải */
+                box-shadow: 0px 0px 8.3px 5px rgba(0, 0, 0, 0.05); /* Shadow từ Figma */
+                margin: 2.5rem auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-around; /* Tự động căn đều khoảng cách */
+                gap: 1rem; /* Giảm khoảng cách mặc định một chút */
+                overflow-x: auto;
+                /* Hide scrollbar */
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none;  /* IE and Edge */
+            }
+            .category-pill-container::-webkit-scrollbar {
+                display: none; /* Chrome, Safari, Opera */
+            }
+
+            .category-item-pill {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                color: #555;
+                transition: all 0.2s ease-in-out;
+                flex-shrink: 0; /* Ngăn các item bị co lại */
+            }
+
+            .category-item-pill:hover {
+                transform: translateY(-5px);
+            }
+
+            .category-item-pill:hover .category-pill-name {
+                color: var(--primary-color, #0d6efd);
+            }
+
+            .category-pill-image-wrapper {
+                width: 75px; /* Tăng kích thước ảnh */
+                height: 75px;
+                margin-bottom: 0.5rem;
+            }
+
+            .category-pill-image-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
+
+            .category-pill-name {
+                font-size: 1rem; /* 16px */
+                font-weight: 500;
+                text-align: center;
+                transition: color 0.2s ease-in-out;
+                color: #000000;
+            }
+
+            @@media (max-width: 768px) {
+                .category-pill-container {
+                    padding: 0.75rem;
+                    gap: 1.5rem; /* Tăng khoảng cách trên mobile */
+                    justify-content: flex-start; /* Bắt đầu từ lề trái */
+                }
+            }
+
+        @@media (max-width: 768px) {
+            .carousel-item img { height: 250px; }
+        }
+    </style>
+}
+
+<!-- Main Banner & Promo Section -->
+<section class="banner-container">
+    <!-- Banner Carousel -->
+    <div id="homeBannerCarousel" class="carousel slide mb-4 shadow-sm rounded-4" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="2"></button>
+            <button type="button" data-bs-target="#homeBannerCarousel" data-bs-slide-to="3"></button>
+        </div>
+        <div class="carousel-inner rounded-4">
+            <!-- Banner 1 -->
+            <div class="carousel-item active">
+                <img src="/images/banner/iphone-17-series-didongmy-banner.jpg" class="d-block w-100" alt="Khuyến mãi Laptop">
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
+                    <h2 class="fw-bold text-white">iPhone 17 Pro Max Cam Vũ Trụ</h2>
+                    <p class="fs-5 text-white mb-0">Thu cũ đổi mới - Trợ giá lên tới 2 Triệu Đồng</p>
+                </div>
+            </div>
+            <!-- Banner 2 -->
+            <div class="carousel-item">
+                <img src="/images/banner/samsung-galaxy-s26-ultra-first-official-promotional-poster-v0-tL7dNLnE8quh_1Dd_6Gh1vfWKNMZWqSisbF-oR-NziA.webp" class="d-block w-100" alt="Khuyến mãi Điện thoại">
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
+                    <h2 class="fw-bold text-white">Samsung Galaxy S26 Ultra</h2>
+                    <p class="fs-5 text-white mb-0">Thu cũ đổi mới - Trợ giá lên tới 2 Triệu Đồng</p>
+                </div>
+            </div>
+            <!-- Banner 3 -->
+            <div class="carousel-item">
+                <img src="/images/banner/vivo-X300-Pro-1024x529.jpg" class="d-block w-100" alt="Khuyến mãi Phụ kiện">
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
+                    <h2 class="fw-bold text-white">VIVO X300 Pro</h2>
+
+                </div>
+            </div>
+
+            <!-- Banner 4 -->
+            <div class="carousel-item">
+                <img src="/images/banner/MacBook-Air-with-M4-chip-Banner.png" class="d-block w-100" alt="Khuyến mãi Phụ kiện">
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
+                    <h2 class="fw-bold text-white">Macbook Air M4</h2>
+                    <p class="fs-5 text-white mb-0">Xanh bay bổng</p>
+                </div>
+            </div>
+
+            <div class="carousel-item">
+                <img src="/images/banner/macbook_neo_relay_slide_1_00e103bc9f.webp" class="d-block w-100" alt="Khuyến mãi Phụ kiện">
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded-3 p-3">
+                    <h2 class="fw-bold text-white">Mới - Macbook Neo</h2>
+                    <p class="fs-5 text-white mb-0">Giá ưu đãi chỉ có tại EasyBuy   </p>
+                </div>
+            </div>
+
+
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#homeBannerCarousel" data-bs-slide="prev" style="z-index: 20; width: 10%;">
+            <span class="carousel-control-prev-icon" aria-hidden="true" style="background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 1.2rem; background-size: 50%;"></span>
+            <span class="visually-hidden">Trước</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#homeBannerCarousel" data-bs-slide="next" style="z-index: 20; width: 10%;">
+            <span class="carousel-control-next-icon" aria-hidden="true" style="background-color: rgba(0,0,0,0.6); border-radius: 50%; padding: 1.2rem; background-size: 50%;"></span>
+            <span class="visually-hidden">Sau</span>
+        </button>
+    </div>
+
+    
+</section>
+
+<!-- Category Pill Section -->
+<section class="category-pill-section">
+    @{
+        // Hàm helper để chuẩn hóa tên file ảnh từ tên danh mục
+        string RemoveDiacritics(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            string normalizedString = text.Normalize(System.Text.NormalizationForm.FormD);
+            var stringBuilder = new System.Text.StringBuilder();
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+            return stringBuilder.ToString().Normalize(System.Text.NormalizationForm.FormC);
+        }
+
+        string NormalizeFileName(string name)
+        {
+            string noDiacritics = RemoveDiacritics(name);
+            // Thêm bước thay thế 'đ' thành 'd' và chuẩn hóa
+            return System.Text.RegularExpressions.Regex.Replace(noDiacritics.ToLower().Replace('đ', 'd'), @"[^a-z0-9]+", "-").Trim('-');
+        }
+    }
+    <div class="category-pill-container">
+        @* --- BẮT ĐẦU KHỐI MÃ TĨNH --- *@
+        @* Đoạn mã này đã được chuyển từ động sang tĩnh để bạn có thể chỉnh sửa chi tiết. *@
+        @* Lưu ý: Mọi thay đổi trong DB sẽ không tự cập nhật ở đây. *@
+
+        <a href="/Home/TrangChu?cate=7" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                <img src="/images/design_shop/laptop.png" alt="Laptop" onerror="this.src='/images/design_shop/default.png'" loading="lazy">
+            </div>
+            <span class="category-pill-name">
+                Laptop
+            </span>
+        </a>
+        <a href="/Home/TrangChu?cate=1" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                <img src="/images/design_shop/dien-thoai.png" alt="Điện thoại" onerror="this.src='/images/design_shop/default.png'" loading="lazy" style="padding: 5px;">
+            </div>
+            <span class="category-pill-name">
+                Điện thoại
+            </span>
+        </a>
+        <a href="/Home/TrangChu?cate=2" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                @* Đã sửa lại đường dẫn ảnh cho Máy tính bảng *@
+                <img src="/images/design_shop/may-tinh-bang.png" alt="Máy tính bảng" onerror="this.src='/images/design_shop/default.png'" loading="lazy" style="padding: 8px;">
+            </div>
+            <span class="category-pill-name">
+                Máy tính bảng
+            </span>
+        </a>
+        <a href="/Home/TrangChu?cate=5" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                <img src="/images/design_shop/tai-nghe.png" alt="Tai nghe" onerror="this.src='/images/design_shop/default.png'" loading="lazy" style="padding: 5px;">
+            </div>
+            <span class="category-pill-name">
+                Tai nghe
+            </span>
+        </a>
+        <a href="/Home/TrangChu?cate=6" class="category-item-pill">
+            <div class="category-pill-image-wrapper">
+                <img src="/images/design_shop/phu-kien.png" alt="Phụ kiện" onerror="this.src='/images/design_shop/default.png'" loading="lazy">
+            </div>
+            <span class="category-pill-name">
+                Phụ kiện
+            </span>
+        </a>
+    </div>
+</section>
+
+
+<!-- Products Section -->
+@{
+    bool isFiltered = !string.IsNullOrEmpty(Context.Request.Query["search"]) ||
+                      !string.IsNullOrEmpty(Context.Request.Query["cate"]) ||
+                      !string.IsNullOrEmpty(Context.Request.Query["brandId"]) ||
+                      !string.IsNullOrEmpty(Context.Request.Query["minPrice"]) ||
+                          !string.IsNullOrEmpty(Context.Request.Query["maxPrice"]) ||
+                          !string.IsNullOrEmpty(Context.Request.Query["categoryName"]) ||
+                          !string.IsNullOrEmpty(Context.Request.Query["isfeatured"]) ||
+                          !string.IsNullOrEmpty(Context.Request.Query["topselling"]) ||
+                          !string.IsNullOrEmpty(Context.Request.Query["page"]);
+    
+    // Thêm tham số 'lightTitle' vào hàm
+    async Task RenderProductSection(string boldTitle, string lightTitle, IEnumerable<Product> products, string queryString, int? limit = null)
+    {
+        if (products != null && products.Any())
+        {
+            var productsToShow = limit.HasValue ? products.Take(limit.Value) : products;
+
+            <section class="category-section mt-5 mb-5">
+                <div class="container">
+                    
+                    <div class="d-flex justify-content-between align-items-baseline mb-4 flex-wrap">
+                        <div class="d-flex align-items-baseline flex-wrap">
+                            <h3 class="fw-bold mb-0" style="font-size: 28px; color: #1d1d1f; letter-spacing: -0.5px;">@boldTitle</h3>
+                            <h3 class="fw-medium mb-0 ms-2" style="font-size: 28px; color: #86868b; letter-spacing: -0.5px;">@lightTitle</h3>
+                        </div>
+                        
+                        <a href="/Home/TrangChu?@queryString" class="text-decoration-none text-dark mt-2 mt-md-0" style="font-size: 15px; font-weight: 500;">
+                            Xem tất cả <i class="fas fa-chevron-right ms-1" style="font-size: 13px;"></i>
+                        </a>
+                    </div>
+                    <div class="row">
+                        @foreach (var item in productsToShow)
+                        {
+                            <div class="col-6 col-md-4 col-lg-3 mb-4">
+                                @await Html.PartialAsync("_ProductCard", item)
+                            </div>
+                        }
+                    </div>
+                </div>
+            </section>
+        }
+    }
+}
+
+@if (isFiltered)
+{
+    <section>
+        <h2 class="section-title">Kết quả tìm kiếm</h2>
+        @if (Model != null && Model.Any())
+        {
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-6 col-md-4 col-lg-3 mb-4">
+                        @* Sử dụng lại Partial View để đảm bảo giao diện nhất quán *@
+                        @await Html.PartialAsync("_ProductCard", item)
+                    </div>
+                }
+            </div>
+
+            <!-- Phân trang -->
+            @if (ViewBag.TotalPages > 1)
+            {
+                <div class="d-flex justify-content-center mt-5 w-100">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination pagination-lg shadow-sm">
+                            @if (ViewBag.CurrentPage > 1)
+                            {
+                                var prevQuery = Context.Request.QueryString.Value ?? "?";
+                                prevQuery = System.Text.RegularExpressions.Regex.Replace(prevQuery, @"(&|\?)page=\d+", "");
+                                prevQuery += (prevQuery == "?" || prevQuery == "" ? "?" : "&") + "page=" + (ViewBag.CurrentPage - 1);
+                                <li class="page-item">
+                                    <a class="page-link" href="/Home/TrangChu@(prevQuery)">&laquo; Trước</a>
+                                </li>
+                            }
+
+                            @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                            {
+                                var query = Context.Request.QueryString.Value ?? "?";
+                                query = System.Text.RegularExpressions.Regex.Replace(query, @"(&|\?)page=\d+", "");
+                                query += (query == "?" || query == "" ? "?" : "&") + "page=" + i;
+
+                                <li class="page-item @(ViewBag.CurrentPage == i ? "active" : "")">
+                                    <a class="page-link" href="/Home/TrangChu@(query)">@i</a>
+                                </li>
+                            }
+
+                            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                            {
+                                var nextQuery = Context.Request.QueryString.Value ?? "?";
+                                nextQuery = System.Text.RegularExpressions.Regex.Replace(nextQuery, @"(&|\?)page=\d+", "");
+                                nextQuery += (nextQuery == "?" || nextQuery == "" ? "?" : "&") + "page=" + (ViewBag.CurrentPage + 1);
+                                <li class="page-item">
+                                    <a class="page-link" href="/Home/TrangChu@(nextQuery)">Sau &raquo;</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Không tìm thấy sản phẩm nào phù hợp</h4>
+                <p class="text-muted">Hãy thử điều chỉnh bộ lọc hoặc tìm kiếm với từ khóa khác</p>
+            </div>
+        }
+    </section>
+}
+else
+{
+    await RenderProductSection("Sản phẩm nổi bật.", "Tinh hoa hội tụ.", ViewBag.FeaturedProducts as IEnumerable<Product>, "isfeatured=true", 4);
+    await RenderProductSection("Đang gây bão.", "Sự lựa chọn của số đông.", ViewBag.TopSellingProducts as IEnumerable<Product>, "topselling=true", 4);
+    await RenderProductSection("Smartphone đỉnh cao.", "Cả thế giới thu bé vừa bằng lòng bàn tay.", ViewBag.Phones as IEnumerable<Product>, "categoryName=Dien thoai", 4);
+    await RenderProductSection("Laptop.", "Hiệu năng bứt phá. Sẵn sàng cho mọi ý tưởng.", ViewBag.Laptops as IEnumerable<Product>, "categoryName=Laptop", 4);
+    await RenderProductSection("Máy tính bảng.", "Mỏng nhẹ tuyệt đối. Sáng tạo vô hạn.", ViewBag.Tablets as IEnumerable<Product>, "categoryName=May tinh bang", 4);
+    await RenderProductSection("Phụ kiện.", "Mảnh ghép hoàn hảo. Nâng tầm trải nghiệm.", ViewBag.Accessories as IEnumerable<Product>, "categoryName=Phu kien", 4);
+}
+
+<!-- Newsletter Section -->
+<section class="bg-light p-5 rounded-3 mt-5">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h3 class="mb-2">Đăng ký nhận tin</h3>
+            <p class="text-muted mb-0">Nhận thông tin về sản phẩm mới và ưu đãi đặc biệt</p>
+        </div>
+        <div class="col-md-4">
+            <div class="input-group">
+                <input type="email" class="form-control" placeholder="Email của bạn">
+                <button class="btn btn-primary" type="button">Đăng ký</button>
+            </div>
+        </div>
+    </div>
+</section>

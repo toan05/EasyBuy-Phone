@@ -1,0 +1,83 @@
+@model EasyBuy.Models.Order
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.OrderId;
+    Layout = "~/Areas/Admin/Views/Layout/_LayoutAdmin.cshtml"; 
+}
+
+<div class="container-fluid pt-4 px-4">
+    <div class="bg-light rounded p-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h4 class="mb-0">Chi tiết đơn hàng #@Model.OrderId</h4>
+            <a href="/Admin/Orders" class="btn btn-outline-primary"><i class="fas fa-arrow-left me-2"></i>Quay lại danh sách</a>
+        </div>
+
+        <div class="row text-start">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0 text-white"><i class="fas fa-user me-2"></i>Thông tin khách hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Khách hàng:</strong> @(Model.User?.FullName ?? "Không rõ")</p>
+                        <p><strong>Số điện thoại:</strong> @(Model.Address?.Phone ?? "Không rõ")</p>
+                        <p><strong>Địa chỉ giao:</strong> @(Model.Address?.FullAddress ?? Model.Address?.Street)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0 text-white"><i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Ngày đặt:</strong> @Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</p>
+                        <p><strong>Trạng thái:</strong> <span class="badge bg-info">@Model.Status</span></p>
+                        <p><strong>Thanh toán:</strong> @(Model.PaymentMethod?.MethodName ?? "COD") - <span class="badge bg-secondary">@Model.StatusPayment</span></p>
+                        <p><strong>Mã giảm giá:</strong> @(Model.Voucher?.Code ?? "Không áp dụng")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive mt-3">
+            <table class="table text-start align-middle table-bordered table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col">Sản phẩm</th>
+                        <th scope="col" class="text-end">Đơn giá</th>
+                        <th scope="col" class="text-center">Số lượng</th>
+                        <th scope="col" class="text-end">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                    {
+                        foreach (var item in Model.OrderDetails)
+                        {
+                            var thanhTien = (item.UnitPrice ?? 0) * (item.Quantity ?? 0);
+                            <tr>
+                                <td>@(item.Product?.ProductName ?? "Sản phẩm đã xóa")</td>
+                                <td class="text-end">@string.Format("{0:N0} ₫", item.UnitPrice)</td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td class="text-end">@string.Format("{0:N0} ₫", thanhTien)</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">Đơn hàng không có sản phẩm</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="text-end fw-bold">Tổng cộng:</td>
+                        <td class="text-end fw-bold text-danger fs-5">@string.Format("{0:N0} ₫", Model.FinalTotal ?? Model.TotalAmount ?? 0)</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

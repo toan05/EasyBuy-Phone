@@ -1,0 +1,162 @@
+@model EasyBuy.Models.Order
+
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.OrderId;
+}
+
+<div class="container-fluid mt-4 px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0 text-gray-800">Chi tiết đơn hàng <span class="text-primary">#@Model.OrderId</span></h3>
+        <div>
+            <span class="badge @(Model.Status == "Chờ xác nhận" ? "bg-warning text-dark" : Model.Status == "Đã xác nhận" ? "bg-success" : Model.Status == "Đã hủy" ? "bg-danger" : "bg-secondary") fs-6 px-3 py-2 rounded-pill shadow-sm">
+                @Model.Status
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Cột trái: Danh sách sản phẩm -->
+        <div class="col-lg-8 col-md-12 mb-4">
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+                    <h5 class="mb-0 fw-bold text-gray-700"><i class="fas fa-box-open text-success me-2"></i>Danh sách sản phẩm</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light text-muted">
+                                <tr>
+                                    <th class="ps-4">Sản phẩm</th>
+                                    <th class="text-end">Đơn giá</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-end pe-4">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderDetails)
+                                {
+                                    <tr>
+                                        <td class="ps-4 py-3 fw-medium text-dark">@item.Product?.ProductName</td>
+                                        <td class="text-end text-muted">@String.Format("{0:N0} đ", item.UnitPrice)</td>
+                                        <td class="text-center">
+                                            <span class="badge bg-light text-dark border px-2 py-1">@item.Quantity</span>
+                                        </td>
+                                        <td class="text-end pe-4 fw-bold text-danger">
+                                            @String.Format("{0:N0} đ", (item.UnitPrice ?? 0) * (item.Quantity ?? 0))
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr class="bg-light">
+                                    <td colspan="3" class="text-end py-3"><strong>Tổng thanh toán:</strong></td>
+                                    <td class="text-end pe-4 py-3"><strong class="text-danger fs-5">@String.Format("{0:N0} đ", Model.FinalTotal ?? Model.TotalAmount)</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons Hành động -->
+            <div class="d-flex justify-content-between">
+                <a href="@Url.Action("ListOrderNew")" class="btn btn-outline-secondary px-4 py-2 rounded-pill shadow-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Quay lại
+                </a>
+                
+                @if (Model.Status == "Chờ xác nhận")
+                {
+                    <button type="button" class="btn btn-primary px-4 py-2 rounded-pill shadow-sm" onclick="exportInvoice(@Model.OrderId)">
+                        <i class="fas fa-check-circle me-1"></i> Xác nhận & Xuất hóa đơn
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Cột phải: Thông tin Khách hàng & Thanh toán -->
+        <div class="col-lg-4 col-md-12">
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+                    <h5 class="mb-0 fw-bold text-gray-700"><i class="fas fa-user-circle text-primary me-2"></i>Khách hàng</h5>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="mb-3">
+                        <label class="text-muted small fw-bold mb-1">Tên khách hàng</label>
+                        <div class="fw-medium text-dark">@Model.User?.FullName</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small fw-bold mb-1">Số điện thoại</label>
+                        <div class="fw-medium text-dark"><i class="fas fa-phone-alt text-secondary me-1"></i> @Model.Address?.Phone</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small fw-bold mb-1">Địa chỉ giao hàng</label>
+                        <div class="fw-medium text-dark"><i class="fas fa-map-marker-alt text-danger me-1"></i> @Model.Address?.FullAddress</div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="text-muted small fw-bold mb-1">Thời gian đặt hàng</label>
+                        <div class="fw-medium text-dark"><i class="far fa-clock text-info me-1"></i> @Model.CreatedAt?.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 rounded-3 mb-4">
+                <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4">
+                    <h5 class="mb-0 fw-bold text-gray-700"><i class="fas fa-credit-card text-warning me-2"></i>Thanh toán</h5>
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="mb-3">
+                        <label class="text-muted small fw-bold mb-1">Phương thức thanh toán</label>
+                        <div class="fw-medium text-dark">@Model.PaymentMethod?.MethodName</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small fw-bold mb-1">Trạng thái giao dịch</label>
+                        <div>
+                            <span class="badge @(Model.StatusPayment == "Đã thanh toán" ? "bg-success" : "bg-warning text-dark")">
+                                @Model.StatusPayment
+                            </span>
+                        </div>
+                    </div>
+                    @if (Model.Voucher != null)
+                    {
+                        <div class="mb-0 border-top pt-3 mt-3">
+                            <label class="text-muted small fw-bold mb-1">Mã khuyến mãi áp dụng</label>
+                            <div class="d-flex align-items-center text-success fw-bold">
+                                <i class="fas fa-ticket-alt me-2"></i>
+                                @Model.Voucher.Code 
+                                <span class="ms-2 badge bg-success-subtle text-success border border-success-subtle">
+                                    -@Model.Voucher.DiscountValue @(Model.Voucher.DiscountType == "percent" ? "%" : "đ")
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script xử lý xuất hóa đơn bằng Ajax ngay trong trang -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function exportInvoice(orderId) {
+        if (confirm('Bạn có chắc chắn muốn XÁC NHẬN đơn hàng và XUẤT HÓA ĐƠN này không?')) {
+            $.ajax({
+                url: '@Url.Action("ExportInvoice", "OrderNVKD", new { area = "NVKD" })',
+                type: 'POST',
+                data: { orderId: orderId },
+                success: function(res) {
+                    if (res.success) {
+                        alert(res.message);
+                        // Reload trang để cập nhật giao diện trạng thái thành "Đã xác nhận"
+                        location.reload();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function() {
+                    alert('Có lỗi xảy ra khi kết nối đến máy chủ.');
+                }
+            });
+        }
+    }
+</script>

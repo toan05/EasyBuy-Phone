@@ -1,0 +1,276 @@
+@{
+    ViewData["Title"] = "Dashboard Admin";
+    Layout = "~/Areas/Admin/Views/Layout/_LayoutAdmin.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
+        <div>
+            <h2 class="h3 mb-1">Dashboard Admin</h2>
+            <p class="text-muted mb-0">Tổng quan hệ thống quản trị EasyBuy</p>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="text-uppercase text-secondary mb-1 small">Tổng người dùng</p>
+                            <h3 class="mb-0">@((ViewBag.TotalUsers ?? 0).ToString())</h3>
+                        </div>
+                        <i class="fas fa-users fa-2x text-primary"></i>
+                    </div>
+                    <p class="text-muted small mb-0">Dữ liệu người dùng hiện có trong hệ thống.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="text-uppercase text-secondary mb-1 small">Tổng sản phẩm</p>
+                            <h3 class="mb-0">@((ViewBag.TotalProducts ?? 0).ToString())</h3>
+                        </div>
+                        <i class="fas fa-boxes fa-2x text-success"></i>
+                    </div>
+                    <p class="text-muted small mb-0">Số lượng mặt hàng đã được quản lý.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="text-uppercase text-secondary mb-1 small">Tổng đơn hàng</p>
+                            <h3 class="mb-0">@((ViewBag.TotalOrders ?? 0).ToString())</h3>
+                        </div>
+                        <i class="fas fa-shopping-cart fa-2x text-info"></i>
+                    </div>
+                    <p class="text-muted small mb-0">Đơn hàng đã được ghi nhận vào hệ thống.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <p class="text-uppercase text-secondary mb-1 small">Tổng doanh thu</p>
+                            <h3 class="mb-0">@((ViewBag.TotalRevenue ?? 0).ToString("N0")) VNĐ</h3>
+                        </div>
+                        <i class="fas fa-dollar-sign fa-2x text-warning"></i>
+                    </div>
+                    <p class="text-muted small mb-0">Tổng doanh thu theo dữ liệu hiện có.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="row gx-2 gy-2 align-items-center mb-3">
+                        <div class="col-auto d-flex align-items-center gap-2">
+                            <label for="chartTypeSelect" class="mb-0 small text-secondary">Loại biểu đồ:</label>
+                            <select id="chartTypeSelect" class="form-select form-select-sm">
+                                <option value="orderStatus">Trạng thái đơn hàng</option>
+                                <option value="revenueProfit">Doanh thu & lợi nhuận</option>
+                                <option value="traffic">Lượng truy cập</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <form method="get" class="row gx-2 gy-2 align-items-end">
+                                <div class="col-auto">
+                                    <label for="fromDate" class="mb-0 small text-secondary">Từ</label>
+                                    <input type="date" id="fromDate" name="fromDate" class="form-control form-control-sm"
+                                           value="@(((DateTime?)ViewBag.StartDate)?.ToString("yyyy-MM-dd"))" />
+                                </div>
+                                <div class="col-auto">
+                                    <label for="toDate" class="mb-0 small text-secondary">Đến</label>
+                                    <input type="date" id="toDate" name="toDate" class="form-control form-control-sm"
+                                           value="@(((DateTime?)ViewBag.EndDate)?.ToString("yyyy-MM-dd"))" />
+                                </div>
+                                <div class="col-auto">
+                                    <button type="submit" class="btn btn-primary btn-sm">Áp dụng</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h6 id="chartTitle" class="mb-1">Trạng thái đơn hàng</h6>
+                        <p id="chartSubtitle" class="text-muted small mb-0">Số lượng đơn hàng phân theo trạng thái.</p>
+                    </div>
+
+                    <div style="min-height: 340px; position: relative;">
+                        <canvas id="adminChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Đơn hàng gần đây</h5>
+                    @if (ViewBag.RecentOrders != null && ViewBag.RecentOrders.Count > 0)
+                    {
+                        <ul class="list-group list-group-flush mt-3">
+                            @foreach (var order in ViewBag.RecentOrders)
+                            {
+                                <li class="list-group-item px-0 py-3">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <strong>#@order.OrderId</strong><br />
+                                            <small class="text-muted">@order.User?.FullName ?? "N/A"</small>
+                                        </div>
+                                        <span class="badge bg-secondary">@order.Status</span>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-inbox fa-2x mb-3"></i>
+                            <p class="mb-0">Chưa có đơn hàng gần đây.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const orderStatusLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.OrderStatusLabels ?? new string[0]));
+        const orderStatusCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.OrderStatusCounts ?? new int[0]));
+        const revenueLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.RevenueLabels ?? new string[0]));
+        const revenueValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.RevenueValues ?? new decimal[0]));
+        const profitValues = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.ProfitValues ?? new decimal[0]));
+        const trafficLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.TrafficLabels ?? new string[0]));
+        const trafficCounts = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.TrafficCounts ?? new int[0]));
+
+        const ctx = document.getElementById('adminChart');
+        let adminChart = null;
+
+        function getChartConfig(type) {
+            if (type === 'orderStatus') {
+                return {
+                    type: 'doughnut',
+                    data: {
+                        labels: orderStatusLabels,
+                        datasets: [{
+                            data: orderStatusCounts,
+                            backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#dc3545', '#6c757d'],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                };
+            }
+
+            if (type === 'revenueProfit') {
+                return {
+                    type: 'bar',
+                    data: {
+                        labels: revenueLabels,
+                        datasets: [
+                            {
+                                label: 'Doanh thu',
+                                data: revenueValues,
+                                backgroundColor: '#0d6efd'
+                            },
+                            {
+                                label: 'Lợi nhuận',
+                                data: profitValues,
+                                backgroundColor: '#198754'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { callback: function(value) { return value.toLocaleString() + ' ₫'; } } }
+                        }
+                    }
+                };
+            }
+
+            return {
+                type: 'line',
+                data: {
+                    labels: trafficLabels,
+                    datasets: [{
+                        label: 'Lượt truy cập',
+                        data: trafficCounts,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13,110,253,0.15)',
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            };
+        }
+
+        function updateChartDetails(type) {
+            const title = document.getElementById('chartTitle');
+            const subtitle = document.getElementById('chartSubtitle');
+            if (type === 'orderStatus') {
+                title.textContent = 'Trạng thái đơn hàng';
+                subtitle.textContent = 'Số lượng đơn hàng phân theo các trạng thái hiện có.';
+            } else if (type === 'revenueProfit') {
+                title.textContent = 'Doanh thu & lợi nhuận';
+                subtitle.textContent = 'So sánh doanh thu và lợi nhuận theo tháng.';
+            } else {
+                title.textContent = 'Lượng truy cập khách hàng';
+                subtitle.textContent = 'Số lần truy cập hệ thống trong 7 ngày gần nhất.';
+            }
+        }
+
+        function renderAdminChart(type) {
+            if (adminChart) {
+                adminChart.destroy();
+            }
+            const config = getChartConfig(type);
+            adminChart = new Chart(ctx, config);
+            updateChartDetails(type);
+        }
+
+        const chartTypeSelect = document.getElementById('chartTypeSelect');
+        chartTypeSelect.addEventListener('change', function() {
+            renderAdminChart(this.value);
+        });
+
+        renderAdminChart(chartTypeSelect.value);
+    </script>
+}
